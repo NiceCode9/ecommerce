@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Kategori;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class KategoriController extends Controller
 {
@@ -12,15 +13,8 @@ class KategoriController extends Controller
      */
     public function index()
     {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+        $kategori = Kategori::all();
+        return view('admin.kategori', compact('kategori'));
     }
 
     /**
@@ -28,15 +22,22 @@ class KategoriController extends Controller
      */
     public function store(Request $request)
     {
-        //
-    }
+        $request->validate([
+            'nama_kategori' => 'required|string|max:255|unique:kategori,nama',
+            'deskripsi' => 'nullable|string'
+        ]);
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Kategori $kategori)
-    {
-        //
+        $kategori = Kategori::create([
+            'nama' => $request->nama_kategori,
+            'slug' => Str::slug($request->nama_kategori),
+            'deskripsi' => $request->deskripsi
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Kategori berhasil ditambahkan',
+            'data' => $kategori
+        ]);
     }
 
     /**
@@ -44,7 +45,7 @@ class KategoriController extends Controller
      */
     public function edit(Kategori $kategori)
     {
-        //
+        return response()->json($kategori);
     }
 
     /**
@@ -52,7 +53,22 @@ class KategoriController extends Controller
      */
     public function update(Request $request, Kategori $kategori)
     {
-        //
+        $request->validate([
+            'nama_kategori' => 'required|string|max:255|unique:kategori,nama,' . $kategori->id,
+            'deskripsi' => 'nullable|string'
+        ]);
+
+        $kategori->update([
+            'nama' => $request->nama_kategori,
+            'slug' => Str::slug($request->nama_kategori),
+            'deskripsi' => $request->deskripsi
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Kategori berhasil diupdate',
+            'data' => $kategori
+        ]);
     }
 
     /**
@@ -60,6 +76,11 @@ class KategoriController extends Controller
      */
     public function destroy(Kategori $kategori)
     {
-        //
+        $kategori->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Kategori berhasil dihapus'
+        ]);
     }
 }
