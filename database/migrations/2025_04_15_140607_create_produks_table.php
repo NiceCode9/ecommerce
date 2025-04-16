@@ -23,8 +23,9 @@ return new class extends Migration
             $table->decimal('berat', 10, 2)->nullable()->comment('dalam gram');
             $table->enum('kondisi', ['Baru', 'Bekas'])->default('Baru');
             $table->foreignId('kategori_id')->constrained('kategori')->onDelete('cascade');
-            $table->foreignId('brand_id')->nullable()->constrained('brand')->onDelete('set null');
+            $table->foreignId('brand_id')->nullable()->constrained('brands')->onDelete('set null');
             $table->foreignId('socket_id')->nullable()->constrained('sockets')->onDelete('set null');
+            $table->unsignedBigInteger('mobo_id')->nullable();
             // $table->foreignId('parent_id')->nullable()->constrained('produk')->onDelete('set null');
             $table->integer('garansi_bulan')->default(0);
             $table->boolean('is_aktif')->default(true);

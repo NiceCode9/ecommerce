@@ -26,6 +26,13 @@ class Produk extends Model
         'dilihat',
     ];
 
+    protected $casts = [
+        'harga' => 'decimal:2',
+        'diskon' => 'decimal:2',
+        'berat' => 'decimal:2',
+        'is_aktif' => 'boolean',
+    ];
+
     public function kategori()
     {
         return $this->belongsTo(Kategori::class);
@@ -61,5 +68,44 @@ class Produk extends Model
     public function spesifikasi()
     {
         return $this->hasMany(SpesifikasiProduk::class);
+    }
+
+    // Relasi dengan gambar utama
+    public function gambarUtama()
+    {
+        return $this->hasOne(GambarProduk::class, 'produk_id')->where('is_utama', true);
+    }
+
+    // Relasi dengan keranjang
+    public function keranjang()
+    {
+        return $this->hasMany(Keranjang::class, 'produk_id');
+    }
+
+    // Relasi dengan wishlist
+    public function wishlist()
+    {
+        return $this->hasMany(Wishlist::class, 'produk_id');
+    }
+
+    // Relasi dengan detail pesanan
+    public function detailPesanan()
+    {
+        return $this->hasMany(DetailPesanan::class, 'produk_id');
+    }
+
+    // Relasi dengan ulasan
+    public function ulasan()
+    {
+        return $this->hasMany(Ulasan::class, 'produk_id');
+    }
+
+    // Menghitung harga setelah diskon
+    public function getHargaSetelahDiskonAttribute()
+    {
+        if ($this->diskon > 0) {
+            return $this->harga - ($this->harga * $this->diskon / 100);
+        }
+        return $this->harga;
     }
 }

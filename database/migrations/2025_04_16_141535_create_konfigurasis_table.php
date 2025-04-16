@@ -11,12 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('metode_pengiriman', function (Blueprint $table) {
+        Schema::create('konfigurasi', function (Blueprint $table) {
             $table->id();
-            $table->string('nama', 100);
-            $table->string('kode', 50);
-            $table->text('deskripsi')->nullable();
-            $table->boolean('is_aktif')->default(true);
+            $table->string('kunci', 100)->unique();
+            $table->text('nilai')->nullable();
+            $table->string('deskripsi')->nullable();
             $table->timestamps();
         });
     }
@@ -26,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('metode_pengiriman');
+        Schema::dropIfExists('konfigurasi');
     }
 };

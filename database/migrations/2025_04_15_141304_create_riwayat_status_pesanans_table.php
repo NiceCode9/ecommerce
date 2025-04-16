@@ -11,9 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('riwayat_status_pesanans', function (Blueprint $table) {
+        Schema::create('riwayat_status_pesanan', function (Blueprint $table) {
             $table->id();
-            $table->timestamps();
+            $table->foreignId('pesanan_id')->constrained('pesanan')->onDelete('cascade');
+            $table->enum('status', ['menunggu_pembayaran', 'diproses', 'dikirim', 'selesai', 'dibatalkan']);
+            $table->text('catatan')->nullable();
+            $table->timestamp('created_at')->useCurrent();
         });
     }
 
@@ -22,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('riwayat_status_pesanans');
+        Schema::dropIfExists('riwayat_status_pesanan');
     }
 };

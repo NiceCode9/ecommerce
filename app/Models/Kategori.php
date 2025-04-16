@@ -14,4 +14,22 @@ class Kategori extends Model
         'gambar',
         'parent_id',
     ];
+
+    // Relasi dengan kategori induk
+    public function parent()
+    {
+        return $this->belongsTo(Kategori::class, 'parent_id');
+    }
+
+    // Relasi dengan sub-kategori
+    public function children()
+    {
+        return $this->hasMany(Kategori::class, 'parent_id');
+    }
+
+    // Relasi dengan produk
+    public function produk()
+    {
+        return $this->hasMany(Produk::class, 'kategori_id');
+    }
 }

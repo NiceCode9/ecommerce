@@ -14,8 +14,13 @@ class GambarProduk extends Model
         'urutan',
     ];
 
+    protected $casts = [
+        'is_utama' => 'boolean',
+    ];
+
+    // Relasi dengan produk
     public function produk()
     {
-        return $this->belongsTo(Produk::class);
+        return $this->belongsTo(Produk::class, 'produk_id');
     }
 }

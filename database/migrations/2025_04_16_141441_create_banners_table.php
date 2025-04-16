@@ -11,12 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('metode_pengiriman', function (Blueprint $table) {
+        Schema::create('banner', function (Blueprint $table) {
             $table->id();
-            $table->string('nama', 100);
-            $table->string('kode', 50);
+            $table->string('judul');
             $table->text('deskripsi')->nullable();
+            $table->string('gambar');
+            $table->string('url')->nullable();
+            $table->integer('urutan')->default(0);
             $table->boolean('is_aktif')->default(true);
+            $table->date('tanggal_mulai')->nullable();
+            $table->date('tanggal_selesai')->nullable();
             $table->timestamps();
         });
     }
@@ -26,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('metode_pengiriman');
+        Schema::dropIfExists('banners');
     }
 };

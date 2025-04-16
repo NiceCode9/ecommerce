@@ -49,6 +49,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'tanggal_lahir' => 'date'
         ];
     }
 
@@ -57,8 +58,44 @@ class User extends Authenticatable
         return $this->role === 'admin';
     }
 
-    public function isPelanggan()
+    public function isCustomer()
     {
         return $this->role === 'pelanggan';
+    }
+
+    // Relasi dengan alamat utama
+    public function alamatUtama()
+    {
+        return $this->belongsTo(Alamat::class, 'alamat_utama');
+    }
+
+    // Relasi dengan semua alamat
+    public function alamat()
+    {
+        return $this->hasMany(Alamat::class, 'pengguna_id');
+    }
+
+    // Relasi dengan keranjang
+    public function keranjang()
+    {
+        return $this->hasMany(Keranjang::class, 'pengguna_id');
+    }
+
+    // Relasi dengan wishlist
+    public function wishlist()
+    {
+        return $this->hasMany(Wishlist::class, 'pengguna_id');
+    }
+
+    // Relasi dengan pesanan
+    public function pesanan()
+    {
+        return $this->hasMany(Pesanan::class, 'pengguna_id');
+    }
+
+    // Relasi dengan ulasan
+    public function ulasan()
+    {
+        return $this->hasMany(Ulasan::class, 'pengguna_id');
     }
 }

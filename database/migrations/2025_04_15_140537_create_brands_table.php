@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('nama', 100);
             $table->string('slug', 100)->unique();
             $table->text('deskripsi')->nullable();
+            $table->boolean('is_processor')->default(false);
             $table->string('logo')->nullable();
             $table->timestamps();
         });

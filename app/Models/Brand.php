@@ -10,6 +10,13 @@ class Brand extends Model
         'nama',
         'slug',
         'deskripsi',
+        'is_processor',
         'logo',
     ];
+
+    // Relasi dengan produk
+    public function produk()
+    {
+        return $this->hasMany(Produk::class, 'merk_id');
+    }
 }
