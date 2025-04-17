@@ -1,15 +1,12 @@
-@extends('admin.layouts.app', ['title' => 'Dashboard'])
+@extends('admin.layouts.app')
 
 @section('content')
-    <div class="alert alert-success" style="display: none;" id="success-message"></div>
-    <div class="alert alert-danger" style="display: none;" id="error-message"></div>
-
     <div class="row">
         <div class="col-md-12">
             <div class="card">
                 <div class="card-body">
                     <a href="javascript:void(0)" class="btn btn-primary btn-sm mb-3 float-right"
-                        data-target="#modal-tambah-kategori" data-toggle="modal">
+                        data-target="#modal-tambah-brand" data-toggle="modal">
                         <i class="fas fa-plus"></i> Tambah Data
                     </a>
 
@@ -18,22 +15,30 @@
                             <thead>
                                 <tr>
                                     <th>No</th>
-                                    <th>Nama Kategori</th>
+                                    <th>Nama Brand</th>
                                     <th>Slug</th>
+                                    <th>Is Processor</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach ($kategori as $k)
+                                @foreach ($brands as $brand)
                                     <tr>
                                         <td>{{ $loop->iteration }}</td>
-                                        <td>{{ $k->nama }}</td>
-                                        <td>{{ $k->slug }}</td>
+                                        <td>{{ $brand->nama }}</td>
+                                        <td>{{ $brand->slug }}</td>
+                                        <td>
+                                            @if ($brand->is_processor)
+                                                <i class="fas fa-check text-success"></i>
+                                            @else
+                                                <i class="fas fa-times text-danger"></i>
+                                            @endif
+                                        </td>
                                         <td>
                                             <button class="btn btn-warning btn-sm btn-edit"
-                                                data-id="{{ $k->id }}">Edit</button>
+                                                data-id="{{ $brand->id }}">Edit</button>
                                             <button class="btn btn-danger btn-sm btn-delete"
-                                                data-id="{{ $k->id }}">Delete</button>
+                                                data-id="{{ $brand->id }}">Delete</button>
                                         </td>
                                     </tr>
                                 @endforeach
@@ -46,25 +51,27 @@
     </div>
 
     <!-- Modal Create -->
-    <div class="modal fade" id="modal-tambah-kategori" data-backdrop="static" data-keyboard="false" tabindex="-1"
+    <div class="modal fade" id="modal-tambah-brand" data-backdrop="static" data-keyboard="false" tabindex="-1"
         aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="staticBackdropLabel">Tambah Kategori</h5>
+                    <h5 class="modal-title">Tambah Brand</h5>
                     <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form id="form-tambah-kategori">
+                <form id="form-tambah-brand">
                     @csrf
                     <div class="modal-body">
                         <div class="mb-3">
-                            <label for="nama_kategori" class="form-label">Nama Kategori</label>
-                            <input type="text" class="form-control" id="nama_kategori" name="nama_kategori"
-                                placeholder="Masukkan Nama Kategori" required>
+                            <label for="nama_brand" class="form-label">Nama Brand</label>
+                            <input type="text" class="form-control" id="nama_brand" name="nama" required>
                         </div>
                         <div class="mb-3">
-                            <label for="deskripsi" class="form-label">Deskripsi</label>
-                            <textarea class="form-control" id="deskripsi" name="deskripsi" rows="3" placeholder="Masukkan Deskripsi Kategori"></textarea>
+                            <label for="is_processor" class="form-label">Is Processor</label>
+                            <select class="form-control" id="is_processor" name="is_processor">
+                                <option value="1">Yes</option>
+                                <option value="0">No</option>
+                            </select>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -77,27 +84,29 @@
     </div>
 
     <!-- Modal Edit -->
-    <div class="modal fade" id="modal-edit-kategori" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    <div class="modal fade" id="modal-edit-brand" data-backdrop="static" data-keyboard="false" tabindex="-1"
         aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Edit Kategori</h5>
+                    <h5 class="modal-title">Edit Brand</h5>
                     <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form id="form-edit-kategori">
+                <form id="form-edit-brand">
                     @csrf
                     @method('PUT')
                     <input type="hidden" id="edit_id">
                     <div class="modal-body">
                         <div class="mb-3">
-                            <label for="edit_nama_kategori" class="form-label">Nama Kategori</label>
-                            <input type="text" class="form-control" id="edit_nama_kategori" name="nama_kategori"
-                                required>
+                            <label for="edit_nama_brand" class="form-label">Nama Brand</label>
+                            <input type="text" class="form-control" id="edit_nama_brand" name="nama" required>
                         </div>
                         <div class="mb-3">
-                            <label for="edit_deskripsi" class="form-label">Deskripsi</label>
-                            <textarea class="form-control" id="edit_deskripsi" name="deskripsi" rows="3"></textarea>
+                            <label for="edit_is_processor" class="form-label">Is Processor</label>
+                            <select class="form-control" id="edit_is_processor" name="is_processor">
+                                <option value="1">Yes</option>
+                                <option value="0">No</option>
+                            </select>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -114,14 +123,14 @@
     <script>
         $(document).ready(function() {
             // Create
-            $('#form-tambah-kategori').submit(function(e) {
+            $('#form-tambah-brand').submit(function(e) {
                 e.preventDefault();
                 $.ajax({
-                    url: "{{ route('admin.kategori.store') }}",
+                    url: "{{ route('admin.brand.store') }}",
                     type: "POST",
                     data: $(this).serialize(),
                     success: function(response) {
-                        $('#modal-tambah-kategori').modal('hide');
+                        $('#modal-tambah-brand').modal('hide');
                         Swal.fire({
                             title: "Success!",
                             text: response.message,
@@ -132,7 +141,7 @@
                         });
                     },
                     error: function(xhr) {
-                        $('#error-message').text(xhr.responseJSON.message).show();
+                        alert(xhr.responseJSON.message);
                     }
                 });
             });
@@ -140,37 +149,37 @@
             // Edit - Load Data
             $(document).on('click', '.btn-edit', function() {
                 let id = $(this).data('id');
-                let url = "{{ route('admin.kategori.edit', ':id') }}".replace(':id', id);
+                let url = "{{ route('admin.brand.edit', ':id') }}".replace(':id', id);
                 $.get(url, function(data) {
                     $('#edit_id').val(data.id);
-                    $('#edit_nama_kategori').val(data.nama);
-                    $('#edit_deskripsi').val(data.deskripsi);
-                    $('#modal-edit-kategori').modal('show');
+                    $('#edit_nama_brand').val(data.nama);
+                    $('#edit_is_processor').val(data.is_processor);
+                    $('#modal-edit-brand').modal('show');
                 });
             });
 
             // Update
-            $('#form-edit-kategori').submit(function(e) {
+            $('#form-edit-brand').submit(function(e) {
                 e.preventDefault();
                 let id = $('#edit_id').val();
-                let url = "{{ route('admin.kategori.update', ':id') }}".replace(':id', id);
+                let url = "{{ route('admin.brand.update', ':id') }}".replace(':id', id);
                 $.ajax({
                     url: url,
                     type: "PUT",
                     data: $(this).serialize(),
                     success: function(response) {
-                        $('#modal-edit-kategori').modal('hide');
+                        $('#modal-edit-brand').modal('hide');
                         Swal.fire({
-                            title: "Gagal!",
+                            title: "Success!",
                             text: response.message,
-                            icon: "error",
+                            icon: "success",
                             allowOutsideClick: false
                         }).then(() => {
                             location.reload();
                         });
                     },
                     error: function(xhr) {
-                        $('#error-message').text(xhr.responseJSON.message).show();
+                        alert(xhr.responseJSON.message);
                     }
                 });
             });
@@ -178,9 +187,8 @@
             // Delete
             $(document).on('click', '.btn-delete', function(e) {
                 e.preventDefault();
-
                 let id = $(this).data('id');
-                let url = "{{ route('admin.kategori.destroy', ':id') }}".replace(':id', id);
+                let url = "{{ route('admin.brand.destroy', ':id') }}".replace(':id', id);
 
                 Swal.fire({
                     title: "Are you sure?",
@@ -200,7 +208,7 @@
                             },
                             success: function(response) {
                                 Swal.fire({
-                                    title: "Berhasil!",
+                                    title: "Deleted!",
                                     text: response.message,
                                     icon: "success",
                                     allowOutsideClick: false
@@ -209,8 +217,7 @@
                                 });
                             },
                             error: function(xhr) {
-                                $('#error-message').text(xhr.responseJSON.message)
-                                    .show();
+                                alert(xhr.responseJSON.message);
                             }
                         });
                     }

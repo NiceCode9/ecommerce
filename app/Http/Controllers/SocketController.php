@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Brand;
 use App\Models\Socket;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class SocketController extends Controller
 {
@@ -12,7 +14,9 @@ class SocketController extends Controller
      */
     public function index()
     {
-        //
+        $sockets = Socket::all();
+        $brands = Brand::all();
+        return view('admin.socket', compact('sockets', 'brands'));
     }
 
     /**
@@ -28,7 +32,15 @@ class SocketController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'nama' => 'required|string|max:255',
+            'deskripsi' => 'nullable|string',
+            'brand_id' => 'required|exists:brands,id',
+        ]);
+
+        Socket::create($request->all());
+
+        return response()->json(['message' => 'Socket berhasil ditambahkan.']);
     }
 
     /**
@@ -44,7 +56,7 @@ class SocketController extends Controller
      */
     public function edit(Socket $socket)
     {
-        //
+        return response()->json($socket);
     }
 
     /**
@@ -52,7 +64,15 @@ class SocketController extends Controller
      */
     public function update(Request $request, Socket $socket)
     {
-        //
+        $request->validate([
+            'nama' => 'required|string|max:255',
+            'deskripsi' => 'nullable|string',
+            'brand_id' => 'required|exists:brands,id',
+        ]);
+
+        $socket->update($request->all());
+
+        return response()->json(['message' => 'Socket berhasil diperbarui.']);
     }
 
     /**
@@ -60,6 +80,8 @@ class SocketController extends Controller
      */
     public function destroy(Socket $socket)
     {
-        //
+        $socket->delete();
+
+        return response()->json(['message' => 'Socket berhasil dihapus.']);
     }
 }
