@@ -1,4 +1,4 @@
-@extends('admin.layouts.app', ['title' => 'Dashboard'])
+@extends('admin.layouts.app', ['title' => 'Data Kategori'])
 
 @section('content')
     <div class="alert alert-success" style="display: none;" id="success-message"></div>
@@ -20,6 +20,7 @@
                                     <th>No</th>
                                     <th>Nama Kategori</th>
                                     <th>Slug</th>
+                                    <th>Tipe</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -29,6 +30,7 @@
                                         <td>{{ $loop->iteration }}</td>
                                         <td>{{ $k->nama }}</td>
                                         <td>{{ $k->slug }}</td>
+                                        <td>{{ $k->tipe }}</td>
                                         <td>
                                             <button class="btn btn-warning btn-sm btn-edit"
                                                 data-id="{{ $k->id }}">Edit</button>
@@ -63,6 +65,15 @@
                                 placeholder="Masukkan Nama Kategori" required>
                         </div>
                         <div class="mb-3">
+                            <label for="tipe">Tipe</label>
+                            <select name="tipe" id="tipe" class="form-control" required>
+                                <option value="processor">Processor</option>
+                                <option value="motherboard">Motherboard</option>
+                                <option value="memory">RAM</option>
+                                <option value="general">General</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
                             <label for="deskripsi" class="form-label">Deskripsi</label>
                             <textarea class="form-control" id="deskripsi" name="deskripsi" rows="3" placeholder="Masukkan Deskripsi Kategori"></textarea>
                         </div>
@@ -94,6 +105,15 @@
                             <label for="edit_nama_kategori" class="form-label">Nama Kategori</label>
                             <input type="text" class="form-control" id="edit_nama_kategori" name="nama_kategori"
                                 required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="tipe">Tipe</label>
+                            <select name="tipe" id="edit_tipe" class="form-control" required>
+                                <option value="processor">Processor</option>
+                                <option value="motherboard">Motherboard</option>
+                                <option value="memory">RAM</option>
+                                <option value="general">General</option>
+                            </select>
                         </div>
                         <div class="mb-3">
                             <label for="edit_deskripsi" class="form-label">Deskripsi</label>
@@ -145,6 +165,7 @@
                     $('#edit_id').val(data.id);
                     $('#edit_nama_kategori').val(data.nama);
                     $('#edit_deskripsi').val(data.deskripsi);
+                    $('#edit_tipe').val(data.tipe);
                     $('#modal-edit-kategori').modal('show');
                 });
             });

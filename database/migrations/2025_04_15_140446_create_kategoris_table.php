@@ -18,6 +18,7 @@ return new class extends Migration
             $table->text('deskripsi')->nullable();
             $table->string('gambar')->nullable();
             $table->unsignedBigInteger('parent_id')->nullable();
+            $table->enum('tipe', ['processor', 'motherboard', 'memory', 'general'])->default('general');
             $table->timestamps();
 
             $table->foreign('parent_id')->references('id')->on('kategori')->onDelete('set null');

@@ -13,6 +13,7 @@ class Kategori extends Model
         'deskripsi',
         'gambar',
         'parent_id',
+        'tipe',
     ];
 
     // Relasi dengan kategori induk
