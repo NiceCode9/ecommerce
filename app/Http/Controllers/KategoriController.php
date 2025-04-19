@@ -61,7 +61,8 @@ class KategoriController extends Controller
         $kategori->update([
             'nama' => $request->nama_kategori,
             'slug' => Str::slug($request->nama_kategori),
-            'deskripsi' => $request->deskripsi
+            'tipe' => $request->tipe,
+            'deskripsi' => $request->deskripsi,
         ]);
 
         return response()->json([

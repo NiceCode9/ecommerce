@@ -1,17 +1,19 @@
-@extends('admin.layouts.app', ['title' => 'Tambah Produk'])
+@extends('admin.layouts.app', ['title' => 'Edit Produk'])
 
 @section('content')
     <div class="row">
         <div class="col-md-12">
             <div class="card">
                 <div class="card-body">
-                    <form action="{{ route('admin.produk.store') }}" method="POST" enctype="multipart/form-data">
+                    <form action="{{ route('admin.produk.update', $produk->id) }}" method="POST"
+                        enctype="multipart/form-data">
                         @csrf
+                        @method('PUT')
                         <div class="form-group">
                             <label for="nama_produk">Nama Produk</label>
                             <input type="text" name="nama_produk" id="nama_produk"
                                 class="form-control @error('nama_produk') is-invalid @enderror"
-                                value="{{ old('nama_produk') }}">
+                                value="{{ old('nama_produk', $produk->nama) }}">
                             @error('nama_produk')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -19,7 +21,8 @@
                         <div class="form-group">
                             <label for="slug">Slug</label>
                             <input type="text" name="slug" id="slug"
-                                class="form-control @error('slug') is-invalid @enderror" value="{{ old('slug') }}">
+                                class="form-control @error('slug') is-invalid @enderror"
+                                value="{{ old('slug', $produk->slug) }}">
                             @error('slug')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -27,14 +30,15 @@
                         <div class="form-group">
                             <label for="sku">SKU</label>
                             <input type="text" name="sku" id="sku"
-                                class="form-control @error('sku') is-invalid @enderror" value="{{ old('sku') }}">
+                                class="form-control @error('sku') is-invalid @enderror"
+                                value="{{ old('sku', $produk->sku) }}">
                             @error('sku')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
                         <div class="form-group">
                             <label for="deskripsi">Deskripsi</label>
-                            <textarea name="deskripsi" id="deskripsi" class="form-control @error('deskripsi') is-invalid @enderror" rows="4">{{ old('deskripsi') }}</textarea>
+                            <textarea name="deskripsi" id="deskripsi" class="form-control @error('deskripsi') is-invalid @enderror" rows="4">{{ old('deskripsi', $produk->deskripsi) }}</textarea>
                             @error('deskripsi')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -43,7 +47,7 @@
                             <label for="harga">Harga</label>
                             <input type="number" name="harga" id="harga"
                                 class="form-control @error('harga') is-invalid @enderror" step="0.01"
-                                value="{{ old('harga') }}">
+                                value="{{ old('harga', $produk->harga) }}">
                             @error('harga')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -52,7 +56,7 @@
                             <label for="diskon">Diskon (%)</label>
                             <input type="number" name="diskon" id="diskon"
                                 class="form-control @error('diskon') is-invalid @enderror" step="0.01"
-                                value="{{ old('diskon') }}">
+                                value="{{ old('diskon', $produk->diskon) }}">
                             @error('diskon')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -60,7 +64,8 @@
                         <div class="form-group">
                             <label for="stok">Stok</label>
                             <input type="number" name="stok" id="stok"
-                                class="form-control @error('stok') is-invalid @enderror" value="{{ old('stok') }}">
+                                class="form-control @error('stok') is-invalid @enderror"
+                                value="{{ old('stok', $produk->stok) }}">
                             @error('stok')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -69,7 +74,7 @@
                             <label for="berat">Berat (gram)</label>
                             <input type="number" name="berat" id="berat"
                                 class="form-control @error('berat') is-invalid @enderror" step="0.01"
-                                value="{{ old('berat') }}">
+                                value="{{ old('berat', $produk->berat) }}">
                             @error('berat')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -78,8 +83,10 @@
                             <label for="kondisi">Kondisi</label>
                             <select name="kondisi" id="kondisi"
                                 class="form-control @error('kondisi') is-invalid @enderror">
-                                <option value="baru" {{ old('kondisi') == 'baru' ? 'selected' : '' }}>Baru</option>
-                                <option value="bekas" {{ old('kondisi') == 'bekas' ? 'selected' : '' }}>Bekas</option>
+                                <option value="baru" {{ old('kondisi', $produk->kondisi) == 'baru' ? 'selected' : '' }}>
+                                    Baru</option>
+                                <option value="bekas" {{ old('kondisi', $produk->kondisi) == 'bekas' ? 'selected' : '' }}>
+                                    Bekas</option>
                             </select>
                             @error('kondisi')
                                 <div class="invalid-feedback">{{ $message }}</div>
@@ -92,7 +99,8 @@
                                 <option value="">--Pilih Brand--</option>
                                 @foreach ($brands as $item)
                                     <option value="{{ $item->id }}" data-ispro="{{ $item->is_processor }}"
-                                        {{ old('brand_id') == $item->id ? 'selected' : '' }}>{{ $item->nama }}</option>
+                                        {{ old('brand_id', $produk->brand_id) == $item->id ? 'selected' : '' }}>
+                                        {{ $item->nama }}</option>
                                 @endforeach
                             </select>
                             @error('brand_id')
@@ -106,7 +114,8 @@
                                 <option value="">--Pilih Kategori--</option>
                                 @foreach ($kategori as $item)
                                     <option value="{{ $item->id }}"
-                                        {{ old('kategori_id') == $item->id ? 'selected' : '' }}>{{ $item->nama }}
+                                        {{ old('kategori_id', $produk->kategori_id) == $item->id ? 'selected' : '' }}>
+                                        {{ $item->nama }}
                                     </option>
                                 @endforeach
                             </select>
@@ -121,7 +130,8 @@
                                 <option value="">--Pilih Socket--</option>
                                 @foreach ($sockets as $item)
                                     <option value="{{ $item->id }}"
-                                        {{ old('socket_id') == $item->id ? 'selected' : '' }}>{{ $item->nama }}</option>
+                                        {{ old('socket_id', $produk->socket_id) == $item->id ? 'selected' : '' }}>
+                                        {{ $item->nama }}</option>
                                 @endforeach
                             </select>
                             @error('socket_id')
@@ -135,7 +145,8 @@
                                 <option value="">--Pilih Mobo--</option>
                                 @foreach ($mobos as $item)
                                     <option value="{{ $item->id }}"
-                                        {{ old('mobo_id') == $item->id ? 'selected' : '' }}>{{ $item->nama }}</option>
+                                        {{ old('mobo_id', $produk->mobo_id) == $item->id ? 'selected' : '' }}>
+                                        {{ $item->nama }}</option>
                                 @endforeach
                             </select>
                             @error('mobo_id')
@@ -146,7 +157,7 @@
                             <label for="garansi_bulan">Garansi (bulan)</label>
                             <input type="number" name="garansi_bulan" id="garansi_bulan"
                                 class="form-control @error('garansi_bulan') is-invalid @enderror"
-                                value="{{ old('garansi_bulan') }}">
+                                value="{{ old('garansi_bulan', $produk->garansi_bulan) }}">
                             @error('garansi_bulan')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -155,16 +166,64 @@
                             <label for="is_aktif">Aktif</label>
                             <select name="is_aktif" id="is_aktif"
                                 class="form-control @error('is_aktif') is-invalid @enderror">
-                                <option value="1" {{ old('is_aktif') == '1' ? 'selected' : '' }}>Ya</option>
-                                <option value="0" {{ old('is_aktif') == '0' ? 'selected' : '' }}>Tidak</option>
+                                <option value="1" {{ old('is_aktif', $produk->is_aktif) == '1' ? 'selected' : '' }}>
+                                    Ya</option>
+                                <option value="0" {{ old('is_aktif', $produk->is_aktif) == '0' ? 'selected' : '' }}>
+                                    Tidak</option>
                             </select>
                             @error('is_aktif')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
+
+                        <!-- Gambar yang sudah ada -->
+                        <div class="row mb-3">
+                            <div class="col-md-12">
+                                <label>Gambar Produk (Yang Sudah Ada)</label>
+                                <div class="table-responsive">
+                                    <table class="table table-bordered" id="existing-image-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Preview</th>
+                                                <th>Gambar Utama</th>
+                                                <th>Urutan</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach ($produk->gambar as $gambar)
+                                                <tr>
+                                                    <td>
+                                                        <img src="{{ asset('storage/' . $gambar->gambar) }}"
+                                                            height="50">
+                                                    </td>
+                                                    <td>
+                                                        <input type="radio" name="is_utama_existing"
+                                                            value="{{ $gambar->id }}"
+                                                            {{ $gambar->is_utama ? 'checked' : '' }}>
+                                                    </td>
+                                                    <td>
+                                                        <input type="number" name="urutan_existing[{{ $gambar->id }}]"
+                                                            class="form-control" value="{{ $gambar->urutan }}">
+                                                    </td>
+                                                    <td>
+                                                        <button type="button"
+                                                            class="btn btn-danger btn-sm remove-existing-image"
+                                                            data-id="{{ $gambar->id }}">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Gambar baru -->
                         <div class="form-group">
-                            <label for="gambar">Gambar</label>
-                            <div class="row" id="image-preview"></div>
+                            <label for="gambar">Tambah Gambar Baru</label>
                             <input type="file" name="gambar[]" id="gambar"
                                 class="form-control @error('gambar.*') is-invalid @enderror" multiple accept="image/*">
                             @error('gambar.*')
@@ -221,6 +280,7 @@
                             </div>
                         </div>
 
+                        <!-- Spesifikasi -->
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="table-responsive">
@@ -265,28 +325,32 @@
                                                     </tr>
                                                 @endforeach
                                             @else
-                                                <tr>
-                                                    <td>
-                                                        <input type="text" name="nama_spek[]"
-                                                            class="form-control @error('nama_spek.*') is-invalid @enderror">
-                                                        @error('nama_spek.*')
-                                                            <div class="invalid-feedback">{{ $message }}</div>
-                                                        @enderror
-                                                    </td>
-                                                    <td>
-                                                        <input type="text" name="nilai[]"
-                                                            class="form-control @error('nilai.*') is-invalid @enderror">
-                                                        @error('nilai.*')
-                                                            <div class="invalid-feedback">{{ $message }}</div>
-                                                        @enderror
-                                                    </td>
-                                                    <td>
-                                                        <button type="button"
-                                                            class="btn btn-danger btn-sm remove-spesifikasi">
-                                                            <i class="fas fa-trash"></i>
-                                                        </button>
-                                                    </td>
-                                                </tr>
+                                                @foreach ($produk->spesifikasi as $spesifikasi)
+                                                    <tr>
+                                                        <td>
+                                                            <input type="text" name="nama_spek[]"
+                                                                class="form-control @error('nama_spek.*') is-invalid @enderror"
+                                                                value="{{ $spesifikasi->nama_spek }}">
+                                                            @error('nama_spek.*')
+                                                                <div class="invalid-feedback">{{ $message }}</div>
+                                                            @enderror
+                                                        </td>
+                                                        <td>
+                                                            <input type="text" name="nilai[]"
+                                                                class="form-control @error('nilai.*') is-invalid @enderror"
+                                                                value="{{ $spesifikasi->nilai }}">
+                                                            @error('nilai.*')
+                                                                <div class="invalid-feedback">{{ $message }}</div>
+                                                            @enderror
+                                                        </td>
+                                                        <td>
+                                                            <button type="button"
+                                                                class="btn btn-danger btn-sm remove-spesifikasi">
+                                                                <i class="fas fa-trash"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
                                             @endif
                                         </tbody>
                                     </table>
@@ -294,7 +358,8 @@
                             </div>
                         </div>
 
-                        <button type="submit" class="btn btn-primary">Simpan</button>
+                        <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                        <a href="{{ route('admin.produk.index') }}" class="btn btn-secondary">Batal</a>
                     </form>
                 </div>
             </div>
@@ -431,9 +496,49 @@
 
             $(document).on('click', '.remove-image', function() {
                 $(this).closest('tr').remove();
-                // Reorder remaining images
                 $('#gambar-table tbody tr').each((index, row) => {
                     $(row).find('input[name="urutan[]"]').val(index + 1);
+                });
+            });
+
+            // Hapus gambar yang sudah ada
+            $(document).on('click', '.remove-existing-image', function() {
+                const id = $(this).data('id');
+                const url = "{{ route('admin.produk.destroyGambar', ':id') }}".replace(':id', id);
+                Swal.fire({
+                    title: 'Apakah Anda Yakin?',
+                    text: "Gambar ini akan dihapus!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Ya, Hapus!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: '/admin/produk/gambar/' + id,
+                            type: 'DELETE',
+                            data: {
+                                _token: '{{ csrf_token() }}'
+                            },
+                            success: function(response) {
+                                Swal.fire(
+                                    'Deleted!',
+                                    response.message,
+                                    'success'
+                                ).then(() => {
+                                    location.reload();
+                                });
+                            },
+                            error: function(xhr) {
+                                Swal.fire(
+                                    'Error!',
+                                    xhr.responseJSON.message,
+                                    'error'
+                                );
+                            }
+                        });
+                    }
                 });
             });
         });

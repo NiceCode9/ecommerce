@@ -23,6 +23,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <link rel="stylesheet" href="{{ asset('back') }}/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
     <link rel="stylesheet" href="{{ asset('back') }}/plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
 
+    @stack('css')
+
 </head>
 
 <body class="hold-transition sidebar-mini">

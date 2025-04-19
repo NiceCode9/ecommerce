@@ -180,11 +180,13 @@
                     type: "PUT",
                     data: $(this).serialize(),
                     success: function(response) {
+                        console.log(response);
+
                         $('#modal-edit-kategori').modal('hide');
                         Swal.fire({
-                            title: "Gagal!",
+                            title: "Berhasil!",
                             text: response.message,
-                            icon: "error",
+                            icon: "success",
                             allowOutsideClick: false
                         }).then(() => {
                             location.reload();
