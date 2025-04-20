@@ -88,7 +88,7 @@
                                 <div class="products-slick" data-nav="#slick-nav-1">
                                     @foreach ($products as $product)
                                         <!-- product -->
-                                        <div class="product">
+                                        <div class="product" data-product-id="{{ $product->id }}">
                                             <div class="product-img">
                                                 @if ($product->gambarUtama)
                                                     <img src="{{ asset('storage/' . $product->gambarUtama->gambar) }}"
@@ -110,7 +110,7 @@
                                                 <h3 class="product-name"><a href="">{{ $product->nama }}</a>
                                                 </h3>
                                                 <h4 class="product-price">
-                                                    Rp {{ number_format($product->harga_diskon, 0, ',', '.') }}
+                                                    Rp {{ number_format($product->harga_setelah_diskon, 0, ',', '.') }}
                                                     @if ($product->diskon)
                                                         <del class="product-old-price">Rp
                                                             {{ number_format($product->harga, 0, ',', '.') }}</del>
@@ -238,7 +238,7 @@
                                 <div class="products-slick" data-nav="#slick-nav-2">
                                     @foreach ($topSelling as $product)
                                         <!-- product -->
-                                        <div class="product">
+                                        <div class="product" data-product-id="{{ $product->id }}">
                                             <div class="product-img">
                                                 @if ($product->gambarUtama)
                                                     <img src="{{ asset('storage/' . $product->gambarUtama->gambar) }}"
@@ -261,7 +261,7 @@
                                                 <h3 class="product-name"><a href="">{{ $product->nama }}</a>
                                                 </h3>
                                                 <h4 class="product-price">
-                                                    Rp {{ number_format($product->harga_diskon, 0, ',', '.') }}
+                                                    Rp {{ number_format($product->harga_setelah_diskon, 0, ',', '.') }}
                                                     @if ($product->diskon)
                                                         <del class="product-old-price">Rp
                                                             {{ number_format($product->harga, 0, ',', '.') }}</del>
@@ -277,14 +277,22 @@
                                                     @endfor
                                                 </div>
                                                 <div class="product-btns">
-                                                    @livewire('wishlist-button', ['product' => $product], key('wishlist-ts-' . $product->id))
+                                                    <button class="add-to-wishlist"
+                                                        onclick="toggleWishlist({{ $product->id }})">
+                                                        <i
+                                                            class="fa fa-heart{{ auth()->check() && auth()->user()->wishlists()->where('produk_id', $product->id)->exists() ? '' : '-o' }}"></i>
+                                                        <span class="tooltipp">add to wishlist</span>
+                                                    </button>
                                                     <button class="add-to-compare"><i class="fa fa-exchange"></i><span
                                                             class="tooltipp">add to compare</span></button>
-                                                    <button class="quick-view"><i class="fa fa-eye"></i><span
-                                                            class="tooltipp">quick view</span></button>
+                                                    <button class="quick-view"><i class="fa fa-eye"></i><span class="tooltipp">quick view</span>
                                                 </div>
                                             </div>
-                                            <livewire:add-to-cart-button :product="$product" :key="'cart-ts-' . $product->id" />
+                                            <div class="add-to-cart">
+                                                <button class="add-to-cart-btn" onclick="addToCart({{ $product->id }})">
+                                                    <i class="fa fa-shopping-cart"></i> add to cart
+                                                </button>
+                                            </div>
                                         </div>
                                         <!-- /product -->
                                     @endforeach

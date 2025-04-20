@@ -76,13 +76,13 @@ class User extends Authenticatable
     }
 
     // Relasi dengan keranjang
-    public function keranjang()
+    public function carts()
     {
         return $this->hasMany(Keranjang::class, 'pengguna_id');
     }
 
     // Relasi dengan wishlist
-    public function wishlist()
+    public function wishlists()
     {
         return $this->hasMany(Wishlist::class, 'pengguna_id');
     }

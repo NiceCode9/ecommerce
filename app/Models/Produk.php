@@ -13,6 +13,7 @@ class Produk extends Model
         'sku',
         'deskripsi',
         'harga',
+        'harga_setelah_diskon',
         'diskon',
         'stok',
         'berat',
@@ -62,7 +63,7 @@ class Produk extends Model
 
     public function gambar()
     {
-        return $this->hasMany(GambarProduk::class);
+        return $this->hasMany(GambarProduk::class, 'produk_id');
     }
 
     public function spesifikasi()
@@ -77,7 +78,7 @@ class Produk extends Model
     }
 
     // Relasi dengan keranjang
-    public function keranjang()
+    public function carts()
     {
         return $this->hasMany(Keranjang::class, 'produk_id');
     }
@@ -101,11 +102,12 @@ class Produk extends Model
     }
 
     // Menghitung harga setelah diskon
-    public function getHargaSetelahDiskonAttribute()
-    {
-        if ($this->diskon > 0) {
-            return $this->harga - ($this->harga * $this->diskon / 100);
-        }
-        return $this->harga;
-    }
+    // public function getHargaSetelahDiskonAttribute()
+    // {
+    //     if ($this->diskon > 0) {
+    //         return $this->harga - ($this->harga * $this->diskon / 100);
+    //     }
+    //     return $this->harga;
+    // }
+
 }

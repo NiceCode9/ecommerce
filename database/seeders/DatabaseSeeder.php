@@ -27,7 +27,7 @@ class DatabaseSeeder extends Seeder
             BrandSeeder::class,
             SocketSeeder::class,
             ProdukSeeder::class,
-            // UserSeeder::class,
+            UserSeeder::class,
         ]);
     }
 }

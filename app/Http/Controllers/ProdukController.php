@@ -10,6 +10,7 @@ use App\Models\Socket;;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
 
 class ProdukController extends Controller
 {
@@ -417,5 +418,13 @@ class ProdukController extends Controller
         }
 
         return response()->json(['message' => 'Urutan gambar berhasil diupdate']);
+    }
+
+    public function quickView($id)
+    {
+        $product = Produk::with(['gambarUtama', 'kategori', 'gambar'])
+        ->findOrFail($id);
+            
+        return view('front.products.quick-view', compact('product'));
     }
 }
