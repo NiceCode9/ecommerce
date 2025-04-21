@@ -527,6 +527,79 @@
     </footer>
     <!-- /FOOTER -->
 
+    <!-- Modal Tambah Alamat -->
+    <div class="modal fade" id="addAddressModal" tabindex="-1" role="dialog" aria-labelledby="addAddressModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <form id="addressForm" action="{{ route('pelanggan.alamat.store') }}" method="POST">
+                    @csrf
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <h4 class="modal-title" id="addAddressModalLabel">Tambah Alamat Baru</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label>Nama Penerima</label>
+                            <input type="text" class="input" name="nama_penerima" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Nomor Telepon</label>
+                            <input type="text" class="input" name="nomor_telepon" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Provinsi</label>
+                            <select class="input" name="provinsi" id="provinsiSelect" required>
+                                <option value="">Pilih Provinsi</option>
+                                <!-- Options akan diisi via AJAX -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Kota/Kabupaten</label>
+                            <select class="input" name="kota" id="kotaSelect" required disabled>
+                                <option value="">Pilih Kota</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Kecamatan</label>
+                            <input type="text" class="input" name="kecamatan" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Kelurahan</label>
+                            <input type="text" class="input" name="kelurahan" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Alamat Lengkap</label>
+                            <textarea class="input" name="alamat_lengkap" rows="3" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Kode Pos</label>
+                            <input type="text" class="input" name="kode_pos" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Catatan (Opsional)</label>
+                            <textarea class="input" name="catatan" rows="2"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-checkbox">
+                                <input type="checkbox" name="is_utama" id="isUtama">
+                                <label for="isUtama">
+                                    <span></span>
+                                    Jadikan alamat utama
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-primary">Simpan Alamat</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <div id="ajax-loader" style="display:none;">
         <div class="spinner-overlay">
             <div class="spinner"></div>

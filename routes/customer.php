@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AlamatController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CheckOutController;
 use App\Http\Controllers\Front\CartController;
@@ -29,5 +30,10 @@ Route::middleware(['auth', 'checkrole:pelanggan'])
             Route::get('/', [CheckOutController::class, 'index'])->name('checkout.index');
             Route::post('/calculate-shipping', [CheckOutController::class, 'calculateShipping'])->name('checkout.calculate-shipping');
             Route::post('/process', [CheckOutController::class, 'process'])->name('checkout.process');
+        });
+        Route::prefix('alamat')->group(function() {
+            Route::get('provinces', [AlamatController::class, 'getProvinces'])->name('alamat.provinces');
+            Route::get('cities/{provinceId}', [AlamatController::class, 'getCities'])->name('alamat.cities');
+            Route::post('store', [AlamatController::class, 'store'])->name('alamat.store');
         });
     });
