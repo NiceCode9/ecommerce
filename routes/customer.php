@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\BrandController;
+use App\Http\Controllers\CheckOutController;
 use App\Http\Controllers\Front\CartController;
 use App\Http\Controllers\Front\WishlistController;
 use App\Http\Controllers\KategoriController;
@@ -22,4 +23,11 @@ Route::middleware(['auth', 'checkrole:pelanggan'])
         Route::get('/wishlist/ajax', [WishlistController::class, 'ajaxIndex'])->name('wishlist.ajax');
         Route::delete('/wishlist/{id}', [WishlistController::class, 'remove'])->name('wishlist.remove');
         Route::get('/wishlist/sort', [WishlistController::class, 'sort'])->name('wishlist.sort');
+
+        // checkout
+        Route::prefix('checkout')->group(function () {
+            Route::get('/', [CheckOutController::class, 'index'])->name('checkout.index');
+            Route::post('/calculate-shipping', [CheckOutController::class, 'calculateShipping'])->name('checkout.calculate-shipping');
+            Route::post('/process', [CheckOutController::class, 'process'])->name('checkout.process');
+        });
     });
