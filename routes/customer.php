@@ -28,12 +28,11 @@ Route::middleware(['auth', 'checkrole:pelanggan'])
         // checkout
         Route::prefix('checkout')->group(function () {
             Route::get('/', [CheckOutController::class, 'index'])->name('checkout.index');
-            Route::post('/calculate-shipping', [CheckOutController::class, 'calculateShipping'])->name('checkout.calculate-shipping');
             Route::post('/process', [CheckOutController::class, 'process'])->name('checkout.process');
         });
-        Route::prefix('alamat')->group(function() {
-            Route::get('provinces', [AlamatController::class, 'getProvinces'])->name('alamat.provinces');
+        Route::prefix('alamat')->group(function () {
             Route::get('cities/{provinceId}', [AlamatController::class, 'getCities'])->name('alamat.cities');
+            Route::get('/get-alamat-pelanggan', [AlamatController::class, 'getAlamat'])->name('alamat.get-alamat-pelanggan');
             Route::post('store', [AlamatController::class, 'store'])->name('alamat.store');
         });
     });

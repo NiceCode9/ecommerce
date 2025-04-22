@@ -2,10 +2,10 @@
 function ajaxRequest(config) {
     // Tampilkan loader
     $('#ajax-loader').show();
-    
+
     return $.ajax({
         ...config,
-        complete: function() {
+        complete: function () {
             // Sembunyikan loader saat selesai
             $('#ajax-loader').hide();
         }
@@ -72,7 +72,7 @@ function addToCart(productId, quantity = 1) {
 
     // Simpan state dropdown sebelum update
     var isCartOpen = $('.dropdown-toggle').parent().hasClass('open');
-    
+
     ajaxRequest({
         url: '/cart/add',
         method: 'POST',
@@ -81,24 +81,24 @@ function addToCart(productId, quantity = 1) {
             quantity: quantity,
             _token: $('meta[name="csrf-token"]').attr('content')
         },
-        success: function(response) {
+        success: function (response) {
             // Update counter cart di header
             $('.cart-qty').text(response.count);
-            
+
             // Update konten dropdown
             $('.cart-dropdown').html(response.html);
-            
+
             // Perbaiki scrollbar
             refreshCartDropdown();
-            
+
             // Kembalikan state dropdown
             if (isCartOpen) {
                 $('.dropdown-toggle').dropdown('toggle');
             }
-            
+
             showToast('Product added to cart');
         },
-        error: function(xhr) {
+        error: function (xhr) {
             showToast('Error: ' + xhr.responseJSON.message, 'error');
         }
     });
@@ -107,14 +107,14 @@ function addToCart(productId, quantity = 1) {
 // Fungsi khusus untuk refresh dropdown cart
 function refreshCartDropdown() {
     var $dropdown = $('.dropdown-toggle').parent();
-    
+
     // Hapus event listeners lama
     $dropdown.off('click.bs.dropdown');
     $dropdown.removeClass('open');
-    
+
     // Init ulang dropdown
     $('.dropdown-toggle').dropdown();
-    
+
     // Force recalculate scrollbar
     $('.cart-list').css('overflow-y', 'hidden').height();
     $('.cart-list').css('overflow-y', 'auto');
@@ -124,32 +124,32 @@ function refreshCartDropdown() {
 function removeCartItem(cartId, event) {
     event.preventDefault();
     event.stopPropagation();
-    
+
     if (!confirm('Are you sure to remove this item?')) return;
     var isCartOpen = $('.dropdown-toggle').parent().hasClass('open');
-    
+
     ajaxRequest({
         url: `/cart/remove/${cartId}`,
         method: 'POST',
         data: {
             _token: $('meta[name="csrf-token"]').attr('content')
         },
-        success: function(response) {
+        success: function (response) {
             $('.cart-qty').text(response.count);
-            
+
             // Update konten dropdown
             $('.cart-dropdown').html(response.html);
-            
+
             // Perbaiki scrollbar
             refreshCartDropdown();
-            
+
             // Kembalikan state dropdown
             if (isCartOpen) {
                 $('.dropdown-toggle').dropdown('toggle');
             }
             showToast('Item removed from cart');
         },
-        error: function(xhr) {
+        error: function (xhr) {
             showToast('Error: ' + xhr.responseJSON.message, 'error');
         }
     });
@@ -158,7 +158,7 @@ function removeCartItem(cartId, event) {
 function updateQuantity(cartId, change) {
     const qtyElement = $(`[data-cart-id="${cartId}"] .qty`);
     const newQty = parseInt(qtyElement.text()) + change;
-    
+
     if (newQty < 1) return;
 
     ajaxRequest({
@@ -168,14 +168,14 @@ function updateQuantity(cartId, change) {
             quantity: newQty,
             _token: $('meta[name="csrf-token"]').attr('content')
         },
-        success: function(response) {
+        success: function (response) {
             qtyElement.text(newQty);
             $(`[data-cart-id="${cartId}"] .subtotal`).text('Rp ' + response.subtotal);
             $('.cart-total').text('Rp ' + response.total);
             $('.cart-qty').text(response.total_item);
             showToast('Cart updated');
         },
-        error: function(xhr) {
+        error: function (xhr) {
             showToast('Error: ' + xhr.responseJSON.message, 'error');
         }
     });
@@ -214,10 +214,10 @@ function showToast(message, type = 'success') {
 //                     </div>
 //                 </div>
 //             `);
-            
+
 //             $('body').append(modal);
 //             $('#quickViewModal').modal('show');
-            
+
 //             // Handle saat modal ditutup
 //             $('#quickViewModal').on('hidden.bs.modal', function () {
 //                 $(this).remove();
@@ -233,7 +233,7 @@ function showQuickView(productId) {
     ajaxRequest({
         url: `/products/quick-view/${productId}`,
         method: 'GET',
-        success: function(response) {
+        success: function (response) {
             const modal = $(`
                 <div class="modal fade" id="quickViewModal" tabindex="-1" role="dialog">
                     <div class="modal-dialog modal-lg" role="document">
@@ -248,10 +248,10 @@ function showQuickView(productId) {
                     </div>
                 </div>
             `);
-            
+
             $('body').append(modal);
             $('#quickViewModal').modal('show');
-            
+
             $('#quickViewModal').on('hidden.bs.modal', function () {
                 $(this).remove();
             });
@@ -264,6 +264,93 @@ function changeMainImage(src) {
     $('.main-image').attr('src', src);
 }
 
+// function cari alamat
+function getAlamatPengguna() {
+    const $alamatSelect = $('select[name=alamat_id]');
+    $alamatSelect.html('<option value="">--pilih alamat--</option>');
+
+    $.ajax({
+        type: "GET",
+        url: "/alamat/get-alamat-pelanggan", // Pastikan URL sesuai dengan route Anda
+        dataType: "json",
+        success: function (response) {
+            let options = '<option value="">--pilih alamat--</option>';
+            $.each(response, function (i, val) {
+                options += `
+                    <option value="${val.alamat_id}"
+                        data-city-id="${val.api_id}"
+                        data-alamat-lengkap="${val.alamat_lengkap}"
+                        data-nama-penerima="${val.nama_penerima}"
+                        data-label="${val.label}"
+                        data-no-telp="${val.nomor_telepon}">
+                        ${val.label} ${val.is_utama ? '- (Alamat Utama)' : ''}
+                    </option>
+                `;
+            });
+            $alamatSelect.html(options);
+        },
+        error: function (xhr) {
+            console.error('Error fetching addresses:', xhr.responseJSON.message);
+            showToast('Gagal memuat alamat pengguna', 'error');
+        }
+    });
+}
+function searchAddress() {
+    const keyword = $('#addressSearchInput').val().trim();
+    if (keyword.length < 3) {
+        alert('Masukkan minimal 3 karakter');
+        return;
+    }
+
+    $('#searchLoading').show();
+    $('#addressResults').empty();
+    $('#noResults').hide();
+
+    $.ajax({
+        url: '/get-wilayah', // Sesuaikan dengan route Anda
+        type: 'GET',
+        data: {
+            keyword: keyword
+        },
+        success: function (response) {
+            console.log(response);
+
+            $('#searchLoading').hide();
+
+            if (response.data.data.length > 0) {
+                response.data.data.forEach(address => {
+                    $('#addressResults').append(`
+                            <tr>
+                                <td>
+                                    ${address.label}<br>
+                                    <small class="text-muted">
+                                        ${address.subdistrict_name}, ${address.district_name},
+                                        ${address.city_name}, ${address.province_name}
+                                    </small>
+                                </td>
+                                <td>${address.zip_code}</td>
+                                <td>
+                                    <button class="btn btn-xs btn-primary select-address"
+                                        data-address='${JSON.stringify(address)}'>
+                                        Pilih
+                                    </button>
+                                </td>
+                            </tr>
+                        `);
+                });
+            } else {
+                $('#noResults').show();
+            }
+        },
+        error: function (xhr) {
+            console.log(xhr.responseJSON.message);
+
+            $('#searchLoading').hide();
+            showToast('Terjadi kesalahan saat mencari alamat');
+        }
+    });
+}
+
 // Update counter wishlist dan cart saat load halaman
 $(document).ready(function () {
     if ($('meta[name="authenticated"]').attr('content') === 'true') {
@@ -271,9 +358,79 @@ $(document).ready(function () {
     }
 
     // Event listener untuk tombol quick view
-    $(document).on('click', '.quick-view', function(e) {
+    $(document).on('click', '.quick-view', function (e) {
         e.preventDefault();
         const productId = $(this).closest('.product').data('product-id');
         showQuickView(productId);
+    });
+
+    // Handle pencarian alamat
+    $(document).on('click', 'input[name="cari-alamat"]', function () {
+        $('#searchAddressModal').modal('show');
+    });
+    $('#searchAddressModal').on('show.bs.modal', function () {
+        $('.modal-backdrop').not(':first').remove();
+    });
+
+    $('#addressSearchTrigger').click(function () {
+        $('#addAddressModal').modal('hide'); // Sembunyikan sementara modal parent
+        $('#searchAddressModal').modal('show');
+    });
+
+    // Saat modal pencarian ditutup
+    $('#searchAddressModal').on('hidden.bs.modal', function () {
+        $('#addAddressModal').modal('show'); // Tampilkan kembali modal parent
+    });
+    $('#searchAddressBtn').click(searchAddress);
+    $('#addressSearchInput').keypress(function (e) {
+        if (e.which == 13) { // Enter key
+            searchAddress();
+        }
+    });
+    // Pilih alamat dari hasil pencarian
+    $(document).on('click', '.select-address', function () {
+        $('#searchAddressModal').modal('hide');
+        const address = $(this).data('address');
+
+        // Isi field-field di form utama
+        $('input[name="nama_penerima"]').val(''); // Reset dulu
+        $('input[name="nomor_telepon"]').val(''); // Reset dulu
+        $('input[name="provinsi"]').val(address.province_name);
+        $('input[name="kota"]').val(address.city_name);
+        $('input[name="kecamatan"]').val(address.subdistrict_name);
+        $('input[name="kelurahan"]').val(address
+            .district_name); // Catatan: district_name biasanya nama kecamatan
+        $('input[name="kode_pos"]').val(address.zip_code);
+        $('textarea[name="alamat_lengkap"]').val(address.label);
+        $('input[name="label"]').val(address.label);
+        $('input[name="api_id"]').val(address.id); // Simpan ID dari API
+
+        // Update tampilan
+        $('input[name="cari-alamat"]').val(address.label);
+
+        // Tutup modal pencarian
+        $('#searchAddressModal').modal('hide');
+    });
+
+    // Submit form alamat via AJAX
+    $('#addressForm').submit(function (e) {
+        e.preventDefault();
+
+        ajaxRequest({
+            url: $(this).attr('action'),
+            type: 'POST',
+            data: $(this).serialize(),
+            success: function (response) {
+                if (response.success) {
+                    $('#addAddressModal').modal('hide');
+                    showToast('Alamat berhasil ditambahkan');
+
+                    getAlamatPengguna();
+                }
+            },
+            error: function (xhr) {
+                alert('Terjadi kesalahan: ' + xhr.responseJSON.message);
+            }
+        });
     });
 });

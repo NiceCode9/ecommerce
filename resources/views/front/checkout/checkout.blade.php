@@ -1,5 +1,59 @@
 @extends('front.layouts.main')
 
+@push('style')
+    <style>
+        .shipping-options {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #eee;
+            padding: 15px;
+            border-radius: 4px;
+        }
+
+        .shipping-option {
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+
+        .shipping-option:hover {
+            border-color: #D10024;
+        }
+
+        .shipping-option label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            cursor: pointer;
+        }
+
+        .shipping-method {
+            font-weight: bold;
+            flex: 2;
+        }
+
+        .shipping-etd {
+            color: #666;
+            flex: 1;
+            text-align: center;
+        }
+
+        .shipping-cost {
+            color: #D10024;
+            font-weight: bold;
+            flex: 1;
+            text-align: right;
+        }
+
+        input[type="radio"]:checked+label {
+            color: #D10024;
+        }
+    </style>
+@endpush
+
 @section('title', 'Checkout - ' . config('app.name'))
 
 @section('content')
@@ -38,16 +92,17 @@
                                 <label>Pilih Alamat</label>
                                 <select class="input" name="alamat_id" id="alamatSelect" required>
                                     <option value="">-- Pilih Alamat --</option>
-                                    @foreach ($alamats as $alamat)
+                                    {{-- @foreach ($alamats as $alamat)
                                         <option value="{{ $alamat->id }}" {{ $alamat->is_utama ? 'selected' : '' }}
                                             data-city-id="{{ $alamat->city_id }}">
                                             {{ $alamat->nama_penerima }} - {{ $alamat->alamat_lengkap }}
                                             ({{ $alamat->is_utama ? 'Utama' : '' }})
                                         </option>
-                                    @endforeach
+                                    @endforeach --}}
                                 </select>
-                                <a href="" class="btn btn-link">+ Tambah Alamat
-                                    Baru</a>
+                                <a href="#" data-toggle="modal" data-target="#addAddressModal" class="btn btn-link">
+                                    <i class="fa fa-plus"></i> Tambah Alamat Baru
+                                </a>
                             </div>
 
                             <!-- Display selected address details -->
@@ -63,7 +118,7 @@
                                 <h3 class="title">Metode Pengiriman</h3>
                             </div>
 
-                            <div class="form-group">
+                            {{-- <div class="form-group">
                                 <label>Pilih Kurir</label>
                                 <select class="input" name="courier" id="courierSelect" required disabled>
                                     <option value="">-- Pilih setelah memilih alamat --</option>
@@ -71,11 +126,11 @@
                                     <option value="tiki">TIKI</option>
                                     <option value="pos">POS Indonesia</option>
                                 </select>
-                            </div>
+                            </div> --}}
 
-                            <div class="form-group" id="serviceOptions" style="display: none;">
+                            <div class="form-group" id="serviceOptions">
                                 <label>Pilih Layanan</label>
-                                <div id="serviceList">
+                                <div id="serviceList" class="shipping-options">
                                     <!-- Options will be populated via AJAX -->
                                 </div>
                             </div>
@@ -151,102 +206,134 @@
         </div>
     </div>
     <!-- /SECTION -->
+    {{-- @foreach ($alamats as $alamat)
+            <option value="{{ $alamat->id }}" {{ $alamat->is_utama ? 'selected' : '' }}
+            data-city-id="{{ $alamat->city_id }}">
+            {{ $alamat->nama_penerima }} - {{ $alamat->alamat_lengkap }}
+            ({{ $alamat->is_utama ? 'Utama' : '' }})
+        </option>
+    @endforeach --}}
 @endsection
 
 @push('front-script')
     <script>
         $(document).ready(function() {
-            // Tampilkan detail alamat saat dipilih
+            getAlamatPengguna();
+            // Tampilkan detail alama
+            // t saat dipilih
             $('#alamatSelect').change(function() {
                 const selectedOption = $(this).find('option:selected');
                 if (selectedOption.val()) {
                     $('#alamatDetail').show();
-                    $('#namaPenerima').text(selectedOption.text().split(' - ')[0]);
-                    $('#alamatLengkap').text(selectedOption.text().split(' - ')[1]);
+                    $('#namaPenerima').text(selectedOption.data('nama-penerima'));
+                    $('#alamatLengkap').text(selectedOption.data('label'));
+                    $('#detailAlamat').text(selectedOption.data('alamat-lengkap'));
+                    $('#nomorTelepon').text(selectedOption.data('no-telp'));
+
+                    const destination = parseInt(selectedOption.data('city-id'));
+                    const totalItems = parseInt({{ $totalItems }});
+                    const weight = {{ $totalWeight }} < 1 ? 1 : {{ $totalWeight }};
+
+                    calculateShipping(destination, totalItems, weight);
 
                     // Enable courier selection
-                    $('#courierSelect').prop('disabled', false);
+                    // $('#courierSelect').prop('disabled', false);
 
                     // Hitung ongkir saat courier dipilih
-                    $('#courierSelect').change(function() {
-                        if ($(this).val()) {
-                            hitungOngkir();
-                        }
-                    });
+                    // $('#courierSelect').change(function() {
+                    //     if ($(this).val()) {
+                    //         hitungOngkir();
+                    //     }
+                    // });
                 } else {
                     $('#alamatDetail').hide();
-                    $('#courierSelect').prop('disabled', true);
-                    $('#serviceOptions').hide();
+                    // $('#courierSelect').prop('disabled', true);
+                    // $('#serviceOptions').hide();
                     $('#submitBtn').prop('disabled', true);
                 }
             });
 
-            // Fungsi hitung ongkir via RajaOngkir API
-            function hitungOngkir() {
-                const cityId = $('#alamatSelect option:selected').data('city-id');
-                const courier = $('#courierSelect').val();
-                const weight = {{ $totalWeight }}; // Total berat dari controller
-
-                showLoading();
+            function calculateShipping(destination, totalItem, weight) {
+                // showLoading();
 
                 $.ajax({
-                    url: "{{ route('pelanggan.checkout.calculate-shipping') }}",
-                    type: 'POST',
+                    url: "{{ route('api.calculate-shipping') }}",
+                    type: 'get',
                     data: {
                         _token: '{{ csrf_token() }}',
-                        city_id: cityId,
-                        courier: courier,
-                        weight: weight
+                        receiver_destination_id: destination,
+                        weight: weight,
+                        item_value: totalItem
                     },
                     success: function(response) {
+                        console.log(response);
+
                         if (response.success) {
-                            $('#serviceList').empty();
-
-                            response.services.forEach(service => {
-                                const serviceId = `${courier}_${service.service}`;
-                                const serviceName =
-                                    `${service.service} - ${service.description}`;
-                                const cost = service.cost[0].value;
-                                const etd = service.cost[0].etd;
-
-                                $('#serviceList').append(`
-                            <div class="input-radio">
-                                <input type="radio" name="shipping_service" id="${serviceId}"
-                                    value="${service.service}" data-cost="${cost}">
-                                <label for="${serviceId}">
-                                    <span></span>
-                                    ${serviceName} (${etd} hari) - Rp ${cost.toLocaleString('id-ID')}
-                                </label>
-                            </div>
-                        `);
-                            });
-
-                            $('#serviceOptions').show();
-
-                            // Update total saat layanan dipilih
-                            $('input[name="shipping_service"]').change(function() {
-                                const cost = $(this).data('cost');
-                                const subtotal = {{ $subtotal }};
-                                const grandTotal = subtotal + cost;
-
-                                $('#shippingCost').text('Rp ' + cost.toLocaleString('id-ID'));
-                                $('#grandTotal').text('Rp ' + grandTotal.toLocaleString(
-                                    'id-ID'));
-
-                                // Enable submit button
-                                $('#submitBtn').prop('disabled', false);
-                            });
+                            renderShippingOptions(response.data);
                         } else {
-                            alert('Gagal menghitung ongkos kirim: ' + response.message);
+                            showToast('Gagal menghitung ongkir: ' + response.message);
                         }
                     },
                     error: function(xhr) {
-                        alert('Terjadi kesalahan saat menghitung ongkos kirim');
+                        showToast('Terjadi kesalahan saat menghitung ongkos kirim');
                     },
                     complete: function() {
-                        hideLoading();
+                        // hideLoading();
                     }
                 });
+            }
+
+            function renderShippingOptions(data) {
+                const $serviceList = $('#serviceList');
+                $serviceList.empty();
+
+                // Filter hanya layanan reguler
+                const regularServices = data.data.calculate_reguler;
+
+                if (regularServices.length > 0) {
+                    regularServices.forEach(service => {
+                        const serviceId = `${service.shipping_name.toLowerCase()}_${service.service_name}`;
+                        const serviceName = `${service.shipping_name} - ${service.service_name}`;
+                        const cost = service.shipping_cost;
+                        const etd = service.etd || '1-3 hari';
+
+                        $serviceList.append(`
+                    <div class="shipping-option">
+                        <input type="radio" name="shipping_service"
+                               id="${serviceId}"
+                               value="${service.service_name}"
+                               data-cost="${cost}"
+                               data-etd="${etd}"
+                               data-courier="${service.shipping_name}">
+                        <label for="${serviceId}">
+                            <span class="shipping-method">${serviceName}</span>
+                            <span class="shipping-etd">${etd}</span>
+                            <span class="shipping-cost">Rp ${cost.toLocaleString('id-ID')}</span>
+                        </label>
+                    </div>
+                `);
+                    });
+
+                    $('#serviceOptions').show();
+
+                    // Update total saat layanan dipilih
+                    $('input[name="shipping_service"]').change(function() {
+                        updateOrderSummary($(this).data('cost'));
+                    });
+                } else {
+                    $serviceList.append('<p class="text-muted">Tidak ada layanan tersedia</p>');
+                }
+            }
+
+            function updateOrderSummary(shippingCost) {
+                const subtotal = {{ $subtotal }};
+                const grandTotal = subtotal + parseInt(shippingCost);
+
+                $('#shippingCost').text('Rp ' + shippingCost.toLocaleString('id-ID'));
+                $('#grandTotal').text('Rp ' + grandTotal.toLocaleString('id-ID'));
+
+                // Enable submit button
+                $('#submitBtn').prop('disabled', false);
             }
 
             function showLoading() {

@@ -37,169 +37,204 @@
   <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
   <![endif]-->
 
-  <style>
-    .toast {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        padding: 12px 24px;
-        background: #4CAF50;
-        color: white;
-        border-radius: 4px;
-        z-index: 1000;
-        animation: slideIn 0.5s, fadeOut 0.5s 2.5s;
-    }
+    <style>
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 12px 24px;
+            background: #4CAF50;
+            color: white;
+            border-radius: 4px;
+            z-index: 1000;
+            animation: slideIn 0.5s, fadeOut 0.5s 2.5s;
+        }
 
-    .toast.error {
-        background: #F44336;
-    }
+        .toast.error {
+            background: #F44336;
+        }
 
         /* Loading Spinner */
-    .spinner-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0,0,0,0.5);
-        z-index: 9999;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
+        .spinner-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
 
-    .spinner {
-        width: 50px;
-        height: 50px;
-        border: 5px solid #f3f3f3;
-        border-top: 5px solid #D10024;
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-    }
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #D10024;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
 
-    /* Quick View Modal */
-    #quickViewModal .modal-dialog {
-        max-width: 900px;
-    }
-    #quickViewModal .modal-body {
-        padding: 30px;
-    }
-    #quickViewModal .close {
-        position: absolute;
-        right: 15px;
-        top: 15px;
-        font-size: 30px;
-        z-index: 1;
-    }
-    .product-gallery {
-        margin-bottom: 20px;
-    }
-    .main-image {
-        width: 100%;
-        height: 400px;
-        object-fit: contain;
-        margin-bottom: 15px;
-    }
-    .gallery-thumbs {
-        display: flex;
-        gap: 10px;
-    }
-    .gallery-thumbs img {
-        width: 70px;
-        height: 70px;
-        object-fit: cover;
-        cursor: pointer;
-        border: 1px solid #ddd;
-    }
-    .gallery-thumbs img:hover {
-        border-color: #D10024;
-    }
-    .product-price {
-        font-size: 24px;
-        color: #D10024;
-        margin: 15px 0;
-    }
-    .product-price del {
-        font-size: 18px;
-        color: #999;
-        margin-left: 10px;
-    }
-    .discount {
-        background: #D10024;
-        color: white;
-        padding: 3px 8px;
-        font-size: 14px;
-        border-radius: 3px;
-        margin-left: 10px;
-    }
-    .product-actions {
-        margin: 20px 0;
-        display: flex;
-        gap: 10px;
-    }
-    .product-actions .btn {
-        padding: 10px 20px;
-    }
+        /* Quick View Modal */
+        #quickViewModal .modal-dialog {
+            max-width: 900px;
+        }
 
-    /* Cart Dropdown Scrollbar */
-    /* .cart-dropdown {
+        #quickViewModal .modal-body {
+            padding: 30px;
+        }
+
+        #quickViewModal .close {
+            position: absolute;
+            right: 15px;
+            top: 15px;
+            font-size: 30px;
+            z-index: 1;
+        }
+
+        .product-gallery {
+            margin-bottom: 20px;
+        }
+
+        .main-image {
+            width: 100%;
+            height: 400px;
+            object-fit: contain;
+            margin-bottom: 15px;
+        }
+
+        .gallery-thumbs {
+            display: flex;
+            gap: 10px;
+        }
+
+        .gallery-thumbs img {
+            width: 70px;
+            height: 70px;
+            object-fit: cover;
+            cursor: pointer;
+            border: 1px solid #ddd;
+        }
+
+        .gallery-thumbs img:hover {
+            border-color: #D10024;
+        }
+
+        .product-price {
+            font-size: 24px;
+            color: #D10024;
+            margin: 15px 0;
+        }
+
+        .product-price del {
+            font-size: 18px;
+            color: #999;
+            margin-left: 10px;
+        }
+
+        .discount {
+            background: #D10024;
+            color: white;
+            padding: 3px 8px;
+            font-size: 14px;
+            border-radius: 3px;
+            margin-left: 10px;
+        }
+
+        .product-actions {
+            margin: 20px 0;
+            display: flex;
+            gap: 10px;
+        }
+
+        .product-actions .btn {
+            padding: 10px 20px;
+        }
+
+        /* Cart Dropdown Scrollbar */
+        /* .cart-dropdown {
         max-height: 400px;
         overflow-y: auto;
         width: 300px; Sesuaikan dengan lebar dropdown
     } */
-    /* Force scrollbar */
-    /* .cart-list {
+        /* Force scrollbar */
+        /* .cart-list {
         overflow-y: scroll !important;
         max-height: 300px;
         display: block;
     } */
 
-    @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
 
-    @keyframes slideIn {
-        from { transform: translateX(100%); }
-        to { transform: translateX(0); }
-    }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
 
-    @keyframes fadeOut {
-        from { opacity: 1; }
-        to { opacity: 0; }
-    }
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+            }
 
-    /* Pagination Styles */
-    .pagination {
-        display: flex;
-        justify-content: center;
-        margin-top: 30px;
-    }
+            to {
+                transform: translateX(0);
+            }
+        }
 
-    .pagination > li > a,
-    .pagination > li > span {
-        color: #D10024;
-        border: 1px solid #ddd;
-        padding: 8px 15px;
-        margin: 0 2px;
-    }
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+            }
 
-    .pagination > li > a:hover {
-        background: #f5f5f5;
-    }
+            to {
+                opacity: 0;
+            }
+        }
 
-    .pagination > .active > span {
-        background-color: #D10024;
-        border-color: #D10024;
-        color: white;
-    }
+        /* Pagination Styles */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+        }
 
-    .pagination > .disabled > span {
-        color: #777;
-    }
-  </style>
+        .pagination>li>a,
+        .pagination>li>span {
+            color: #D10024;
+            border: 1px solid #ddd;
+            padding: 8px 15px;
+            margin: 0 2px;
+        }
 
-  @stack('style')
+        .pagination>li>a:hover {
+            background: #f5f5f5;
+        }
+
+        .pagination>.active>span {
+            background-color: #D10024;
+            border-color: #D10024;
+            color: white;
+        }
+
+        .pagination>.disabled>span {
+            color: #777;
+        }
+
+        #searchAddressModal {
+            z-index: 1060 !important;
+        }
+
+        .modal-backdrop+.modal-backdrop {
+            z-index: 1050 !important;
+        }
+    </style>
+
+    @stack('style')
 
 </head>
 
@@ -217,22 +252,25 @@
                 <ul class="header-links pull-right">
                     <li><a href="#"><i class="fa fa-dollar"></i> USD</a></li>
                     @auth()
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="true">
-                            <i class="fa fa-user-o"></i> My Account <i class="fa fa-caret-down"></i>
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a href="#" class="btn btn-link" style="text-decoration: none; color: inherit;">Profile</a></li>
-                            <li>
-                                <a href="#" class="btn btn-link" style="text-decoration: none; color: inherit;" onclick="event.preventDefault(); document.getElementById('form-logout').submit();">Logout</a>
-                                <form action="{{ route('logout') }}" method="POST" style="display: inline;" id="form-logout">
-                                    @csrf
-                                </form>
-                            </li>
-                        </ul>
-                    </li>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="true">
+                                <i class="fa fa-user-o"></i> My Account <i class="fa fa-caret-down"></i>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a href="#" class="btn btn-link"
+                                        style="text-decoration: none; color: inherit;">Profile</a></li>
+                                <li>
+                                    <a href="#" class="btn btn-link" style="text-decoration: none; color: inherit;"
+                                        onclick="event.preventDefault(); document.getElementById('form-logout').submit();">Logout</a>
+                                    <form action="{{ route('logout') }}" method="POST" style="display: inline;"
+                                        id="form-logout">
+                                        @csrf
+                                    </form>
+                                </li>
+                            </ul>
+                        </li>
                     @else
-                    <li><a href="{{ route('login') }}"><i class="fa fa-user-o"></i> Login</a></li>
+                        <li><a href="{{ route('login') }}"><i class="fa fa-user-o"></i> Login</a></li>
                     @endauth
                 </ul>
             </div>
@@ -279,7 +317,8 @@
                                 <a href="{{ route('pelanggan.wishlist.index') }}">
                                     <i class="fa fa-heart-o"></i>
                                     <span>Your Wishlist</span>
-                                    <div class="qty wishlist-qty">{{ auth()->check() ? auth()->user()->wishlists()->count() : 0 }}</div>
+                                    <div class="qty wishlist-qty">
+                                        {{ auth()->check() ? auth()->user()->wishlists()->count() : 0 }}</div>
                                 </a>
                             </div>
                             <!-- /Wishlist -->
@@ -294,8 +333,8 @@
                                 <div class="cart-dropdown">
                                     <!-- Isi cart dropdown bisa diisi via AJAX juga -->
                                     <div class="cart-list">
-                                        @if(auth()->check())
-                                            @foreach(auth()->user()->carts()->with('produk')->latest()->take(3)->get() as $item)
+                                        @if (auth()->check())
+                                            @foreach (auth()->user()->carts()->with('produk')->latest()->take(3)->get() as $item)
                                             <div class="product-widget">
                                                 <div class="product-img">
                                                     <img src="{{ asset('storage/' . optional($item->produk->gambarUtama)->gambar) }}" alt="">
@@ -326,15 +365,20 @@
                                 <a class="dropdown-toggle" data-toggle="dropdown" aria-expanded="true">
                                     <i class="fa fa-shopping-cart"></i>
                                     <span>Your Cart</span>
-                                    <div class="qty cart-qty">{{ auth()->check() ? auth()->user()->carts()->sum('jumlah') : 0 }}</div>
+                                    <div class="qty cart-qty">
+                                        {{ auth()->check() ? auth()->user()->carts()->sum('jumlah') : 0 }}</div>
                                 </a>
                                 <div class="cart-dropdown">
                                     @include('front.partials.cart-items', [
-                                        'cartItems' => auth()->check() ? auth()->user()->carts()->with('produk.gambarUtama')->latest()->take(3)->get() : [],
+                                        'cartItems' => auth()->check()
+                                            ? auth()->user()->carts()->with('produk.gambarUtama')->latest()->take(3)->get()
+                                            : [],
                                         'cartCount' => auth()->check() ? auth()->user()->carts()->count() : 0,
-                                        'subtotal' => auth()->check() ? auth()->user()->carts()->with('produk')->get()->sum(function($item) {
-                                            return $item->jumlah * $item->produk->harga_setelah_diskon;
-                                        }) : 0
+                                        'subtotal' => auth()->check()
+                                            ? auth()->user()->carts()->with('produk')->get()->sum(function ($item) {
+                                                    return $item->jumlah * $item->produk->harga_setelah_diskon;
+                                                })
+                                            : 0,
                                     ])
                                 </div>
                             </div>
@@ -528,7 +572,8 @@
     <!-- /FOOTER -->
 
     <!-- Modal Tambah Alamat -->
-    <div class="modal fade" id="addAddressModal" tabindex="-1" role="dialog" aria-labelledby="addAddressModalLabel">
+    <div class="modal fade" id="addAddressModal" tabindex="-1" role="dialog"
+        aria-labelledby="addAddressModalLabel">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <form id="addressForm" action="{{ route('pelanggan.alamat.store') }}" method="POST">
@@ -548,34 +593,33 @@
                             <label>Nomor Telepon</label>
                             <input type="text" class="input" name="nomor_telepon" required>
                         </div>
-                        <div class="form-group">
-                            <label>Provinsi</label>
-                            <select class="input" name="provinsi" id="provinsiSelect" required>
-                                <option value="">Pilih Provinsi</option>
-                                <!-- Options akan diisi via AJAX -->
-                            </select>
+                        <div class="form-group" style="display: none;">
+                            <input type="hidden" name="api_id" value="">
+                            <input type="hidden" name="provinsi" class="input">
+                            <input type="hidden" name="kota" id="kota" class="input">
+                            <input type="hidden" class="input" name="kecamatan">
+                            <input type="hidden" class="input" name="kelurahan">
+                            <input type="hidden" class="input" name="kode_pos">
+                            <input type="hidden" class="input" name="label">
                         </div>
                         <div class="form-group">
-                            <label>Kota/Kabupaten</label>
-                            <select class="input" name="kota" id="kotaSelect" required disabled>
-                                <option value="">Pilih Kota</option>
-                            </select>
+                            <label for="cari-alamat">Cari Alamat</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" name="cari-alamat"
+                                    placeholder="Cari Alamat">
+                                <span class="input-group-btn">
+                                    <button class="btn btn-default" type="button">
+                                        <i class="fa fa-search"></i>
+                                    </button>
+                                </span>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label>Kecamatan</label>
-                            <input type="text" class="input" name="kecamatan" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Kelurahan</label>
-                            <input type="text" class="input" name="kelurahan" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Alamat Lengkap</label>
+                        <div class="form-group" style="display: hidden;">
+                            <label>Detail ALamat</label>
                             <textarea class="input" name="alamat_lengkap" rows="3" required></textarea>
                         </div>
                         <div class="form-group">
                             <label>Kode Pos</label>
-                            <input type="text" class="input" name="kode_pos" required>
                         </div>
                         <div class="form-group">
                             <label>Catatan (Opsional)</label>
@@ -583,7 +627,7 @@
                         </div>
                         <div class="form-group">
                             <div class="input-checkbox">
-                                <input type="checkbox" name="is_utama" id="isUtama">
+                                <input type="checkbox" name="is_utama" id="isUtama" value="1">
                                 <label for="isUtama">
                                     <span></span>
                                     Jadikan alamat utama
@@ -596,6 +640,57 @@
                         <button type="submit" class="btn btn-primary">Simpan Alamat</button>
                     </div>
                 </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Pencarian Alamat -->
+    <div class="modal fade" id="searchAddressModal" tabindex="-1" role="dialog"
+        aria-labelledby="searchAddressModalLabel">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" id="searchAddressModalLabel">Cari Alamat</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="addressSearchInput"
+                                placeholder="Masukkan kata kunci alamat...">
+                            <span class="input-group-btn">
+                                <button class="btn btn-primary" id="searchAddressBtn">
+                                    <i class="fa fa-search"></i> Cari
+                                </button>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="search-results">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Alamat Lengkap</th>
+                                    <th>Kode Pos</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="addressResults">
+                                <!-- Hasil pencarian akan muncul di sini -->
+                            </tbody>
+                        </table>
+                        <div id="noResults" style="display: none;">
+                            <p class="text-center text-muted">Tidak ada hasil ditemukan</p>
+                        </div>
+                        <div id="searchLoading" style="display: none;">
+                            <p class="text-center"><i class="fa fa-spinner fa-spin"></i> Mencari alamat...</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Tutup</button>
+                </div>
             </div>
         </div>
     </div>
@@ -614,6 +709,13 @@
     <script src="{{ asset('front') }}/js/jquery.zoom.min.js"></script>
     <script src="{{ asset('front') }}/js/main.js"></script>
     <script src="{{ asset('front/js/custom.js') }}"></script>
+
+    <script>
+        // Buka modal pencarian saat field cari alamat diklik
+        // $('input[name="cari-alamat"]').click(function() {
+        //     $('#searchAddressModal').modal('show');
+        // });
+    </script>
 
     @stack('front-script')
 

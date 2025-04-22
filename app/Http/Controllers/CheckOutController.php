@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Services\RajaOngkirService;
 use App\Models\Alamat;
 use App\Models\Keranjang;
 use Illuminate\Http\Request;
@@ -35,58 +36,21 @@ class CheckOutController extends Controller
             return $item->jumlah * $item->produk->berat;
         });
 
+        $totalItems = $cartItems->sum('jumlah');
+
         // Ambil daftar alamat user
-        $alamats = $user->alamat()->orderBy('is_utama', 'desc')->get();
+        // $alamats = $user->alamat()->orderBy('is_utama', 'desc')->get();
 
         return view('front.checkout.checkout', compact(
             'cartItems',
             'cartIds',
             'subtotal',
             'totalWeight',
-            'alamats'
+            'totalItems',
+            // 'alamats',
         ));
     }
 
-    public function calculateShipping(Request $request)
-    {
-        $request->validate([
-            'city_id' => 'required|numeric',
-            'courier' => 'required|in:jne,tiki,pos',
-            'weight' => 'required|numeric|min:1'
-        ]);
-
-        try {
-            $response = Http::withHeaders([
-                'key' => config('services.rajaongkir.api_key')
-            ])->post('https://api.rajaongkir.com/starter/cost', [
-                'origin' => config('services.rajaongkir.origin_city_id'),
-                'destination' => $request->city_id,
-                'weight' => $request->weight,
-                'courier' => $request->courier
-            ]);
-
-            $result = $response->json();
-
-            if ($result['rajaongkir']['status']['code'] != 200) {
-                return response()->json([
-                    'success' => false,
-                    'message' => $result['rajaongkir']['status']['description']
-                ]);
-            }
-
-            $services = $result['rajaongkir']['results'][0]['costs'];
-
-            return response()->json([
-                'success' => true,
-                'services' => $services
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
-            ]);
-        }
-    }
     public function process(Request $request)
     {
         $request->validate([

@@ -9,6 +9,8 @@ class Alamat extends Model
     protected $table = "alamat";
     protected $fillable = [
         'pengguna_id',
+        'api_id',
+        'label',
         'nama_penerima',
         'nomor_telepon',
         'alamat_lengkap',
