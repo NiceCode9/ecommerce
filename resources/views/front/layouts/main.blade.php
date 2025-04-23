@@ -232,6 +232,79 @@
         .modal-backdrop+.modal-backdrop {
             z-index: 1050 !important;
         }
+
+        /* Timeline */
+        .timeline {
+            list-style: none;
+            padding: 0;
+            position: relative;
+        }
+
+        .timeline:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #eee;
+            left: 5px;
+            margin-left: -1.5px;
+        }
+
+        .timeline>li {
+            position: relative;
+            margin-bottom: 15px;
+            padding-left: 20px;
+        }
+
+        .timeline>li:before {
+            content: '';
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #D10024;
+            left: 0;
+            top: 5px;
+        }
+
+        /* Badge Status */
+        .badge-menunggu_pembayaran {
+            background-color: #ffc107;
+            color: #000;
+        }
+
+        .badge-diproses {
+            background-color: #17a2b8;
+        }
+
+        .badge-dikirim {
+            background-color: #007bff;
+        }
+
+        .badge-selesai {
+            background-color: #28a745;
+        }
+
+        .badge-dibatalkan {
+            background-color: #dc3545;
+        }
+
+        /* resources/css/front.css */
+        .card-payment {
+            border: none;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+
+        .payment-icon {
+            margin-bottom: 20px;
+        }
+
+        .btn-payment-action {
+            min-width: 200px;
+            padding: 10px 20px;
+        }
     </style>
 
     @stack('style')
@@ -284,7 +357,7 @@
                 <!-- row -->
                 <div class="row">
                     <!-- LOGO -->
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                         <div class="header-logo">
                             <a href="#" class="logo">
                                 <img src="{{ asset('front') }}/img/logo.png" alt="">
@@ -294,7 +367,7 @@
                     <!-- /LOGO -->
 
                     <!-- SEARCH BAR -->
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="header-search">
                             <form>
                                 <select class="input-select">
@@ -310,9 +383,17 @@
                     <!-- /SEARCH BAR -->
 
                     <!-- ACCOUNT -->
-                    <div class="col-md-3 clearfix">
+                    <div class="col-md-4 clearfix">
                         <div class="header-ctn">
                             <!-- Wishlist -->
+                            <div>
+                                <a href="{{ route('pelanggan.pesanan.index') }}">
+                                    <i class="fa fa-heart-o"></i>
+                                    <span>Pesanan Saya</span>
+                                    <div class="qty wishlist-qty">
+                                        {{ auth()->check() ? auth()->user()->pesanan()->count() : 0 }}</div>
+                                </a>
+                            </div>
                             <div>
                                 <a href="{{ route('pelanggan.wishlist.index') }}">
                                     <i class="fa fa-heart-o"></i>
@@ -324,42 +405,6 @@
                             <!-- /Wishlist -->
 
                             <!-- Cart -->
-                            {{-- <div class="dropdown">
-                                <a class="dropdown-toggle" data-toggle="dropdown" aria-expanded="true">
-                                    <i class="fa fa-shopping-cart"></i>
-                                    <span>Your Cart</span>
-                                    <div class="qty cart-qty">{{ auth()->check() ? auth()->user()->carts()->sum('jumlah') : 0 }}</div>
-                                </a>
-                                <div class="cart-dropdown">
-                                    <!-- Isi cart dropdown bisa diisi via AJAX juga -->
-                                    <div class="cart-list">
-                                        @if (auth()->check())
-                                            @foreach (auth()->user()->carts()->with('produk')->latest()->take(3)->get() as $item)
-                                            <div class="product-widget">
-                                                <div class="product-img">
-                                                    <img src="{{ asset('storage/' . optional($item->produk->gambarUtama)->gambar) }}" alt="">
-                                                </div>
-                                                <div class="product-body">
-                                                    <h3 class="product-name"><a href="#">{{ $item->produk->nama }}</a></h3>
-                                                    <h4 class="product-price"><span class="qty">{{ $item->jumlah }}x</span>Rp {{ number_format($item->produk->harga_setelah_diskon, 0, ',', '.') }}</h4>
-                                                </div>
-                                                <button class="delete"><i class="fa fa-close"></i></button>
-                                            </div>
-                                            @endforeach
-                                        @endif
-                                    </div>
-                                    <div class="cart-summary">
-                                        <small>{{ auth()->check() ? auth()->user()->carts()->count() : 0 }} Item(s) selected</small>
-                                        <h5>SUBTOTAL: Rp {{ auth()->check() ? number_format(auth()->user()->carts()->with('produk')->get()->sum(function($item) {
-                                            return $item->jumlah * $item->produk->harga_setelah_diskon;
-                                        }), 0, ',', '.') : 0 }}</h5>
-                                    </div>
-                                    <div class="cart-btns">
-                                        <a href="">View Cart</a>
-                                        <a href="">Checkout  <i class="fa fa-arrow-circle-right"></i></a>
-                                    </div>
-                                </div>
-                            </div> --}}
                             {{-- @if (!request()->is('cart')) --}}
                             <div class="dropdown">
                                 <a class="dropdown-toggle" data-toggle="dropdown" aria-expanded="true">

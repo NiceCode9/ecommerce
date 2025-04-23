@@ -76,7 +76,17 @@
     <!-- SECTION -->
     <div class="section">
         <div class="container">
-            <form id="checkoutForm" action="" method="POST">
+            @if ($errors->any())
+                <div class="alert alert-danger">
+                    <ul>
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+
+            @endif
+            <form id="checkoutForm" action="{{ route('pelanggan.checkout.process') }}" method="POST">
                 @csrf
                 <input type="hidden" name="cart_ids" value="{{ json_encode($cartIds) }}">
 
@@ -175,15 +185,24 @@
                                     <div><strong>TOTAL</strong></div>
                                     <div><strong class="order-total" id="grandTotal">Rp
                                             {{ number_format($subtotal, 0, ',', '.') }}</strong></div>
+                                    <input type="hidden" name="shipping_cost" id="shippingCostInput"
+                                        value="{{ $subtotal }}">
                                 </div>
                             </div>
 
                             <div class="payment-method">
                                 <div class="input-radio">
-                                    <input type="radio" name="payment_method" id="payment-1" value="midtrans" checked>
+                                    <input type="radio" name="payment_method" id="payment-1" value="cod" checked>
                                     <label for="payment-1">
                                         <span></span>
-                                        Pembayaran Online (Midtrans)
+                                        COD
+                                    </label>
+                                </div>
+                                <div class="input-radio">
+                                    <input type="radio" name="payment_method" id="payment-2" value="midtrans" checked>
+                                    <label for="payment-2">
+                                        <span></span>
+                                        Pembarayan Online
                                     </label>
                                 </div>
                             </div>
@@ -223,6 +242,8 @@
             // t saat dipilih
             $('#alamatSelect').change(function() {
                 const selectedOption = $(this).find('option:selected');
+                console.log(selectedOption.val());
+
                 if (selectedOption.val()) {
                     $('#alamatDetail').show();
                     $('#namaPenerima').text(selectedOption.data('nama-penerima'));
@@ -236,15 +257,6 @@
 
                     calculateShipping(destination, totalItems, weight);
 
-                    // Enable courier selection
-                    // $('#courierSelect').prop('disabled', false);
-
-                    // Hitung ongkir saat courier dipilih
-                    // $('#courierSelect').change(function() {
-                    //     if ($(this).val()) {
-                    //         hitungOngkir();
-                    //     }
-                    // });
                 } else {
                     $('#alamatDetail').hide();
                     // $('#courierSelect').prop('disabled', true);
@@ -305,6 +317,7 @@
                                data-cost="${cost}"
                                data-etd="${etd}"
                                data-courier="${service.shipping_name}">
+                               <input type="hidden" name="shipping_name" value="${service.shipping_name}">
                         <label for="${serviceId}">
                             <span class="shipping-method">${serviceName}</span>
                             <span class="shipping-etd">${etd}</span>
@@ -331,6 +344,7 @@
 
                 $('#shippingCost').text('Rp ' + shippingCost.toLocaleString('id-ID'));
                 $('#grandTotal').text('Rp ' + grandTotal.toLocaleString('id-ID'));
+                $('#shippingCostInput').val(grandTotal);
 
                 // Enable submit button
                 $('#submitBtn').prop('disabled', false);

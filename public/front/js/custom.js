@@ -277,7 +277,7 @@ function getAlamatPengguna() {
             let options = '<option value="">--pilih alamat--</option>';
             $.each(response, function (i, val) {
                 options += `
-                    <option value="${val.alamat_id}"
+                    <option value="${val.id}"
                         data-city-id="${val.api_id}"
                         data-alamat-lengkap="${val.alamat_lengkap}"
                         data-nama-penerima="${val.nama_penerima}"

@@ -6,7 +6,9 @@ use App\Http\Controllers\CheckOutController;
 use App\Http\Controllers\Front\CartController;
 use App\Http\Controllers\Front\WishlistController;
 use App\Http\Controllers\KategoriController;
+use App\Http\Controllers\PesananController;
 use App\Http\Controllers\ProdukController;
+use App\Http\Controllers\SettingController;
 use App\Http\Controllers\SocketController;
 use Illuminate\Support\Facades\Route;
 
@@ -28,11 +30,19 @@ Route::middleware(['auth', 'checkrole:pelanggan'])
         // checkout
         Route::prefix('checkout')->group(function () {
             Route::get('/', [CheckOutController::class, 'index'])->name('checkout.index');
-            Route::post('/process', [CheckOutController::class, 'process'])->name('checkout.process');
+            Route::post('/checkout/process', [CheckoutController::class, 'process'])->name('checkout.process');
+            // Route::get('/pesanan/{id}', [PesananController::class, 'show'])->name('pesanan.show');
         });
         Route::prefix('alamat')->group(function () {
             Route::get('cities/{provinceId}', [AlamatController::class, 'getCities'])->name('alamat.cities');
             Route::get('/get-alamat-pelanggan', [AlamatController::class, 'getAlamat'])->name('alamat.get-alamat-pelanggan');
             Route::post('store', [AlamatController::class, 'store'])->name('alamat.store');
         });
+
+        Route::get('/pesanan', [PesananController::class, 'index'])->name('pesanan.index');
+        Route::get('/pesanan/{id}', [PesananController::class, 'show'])->name('pesanan.show');
+        Route::post('/pesanan/{id}/confirm-cod', [PesananController::class, 'confirmCodPayment'])
+            ->name('pesanan.confirm-cod');
+        Route::get('/payment/success', [SettingController::class, 'success'])->name('payment.success');
+        Route::get('/payment/failed', [SettingController::class, 'failed'])->name('payment.failed');
     });

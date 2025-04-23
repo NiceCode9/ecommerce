@@ -21,7 +21,8 @@ return new class extends Migration
             $table->decimal('biaya_pengiriman', 10, 2)->default(0.00);
             $table->decimal('total_bayar', 15, 2);
             $table->foreignId('alamat_pengiriman_id')->constrained('alamat');
-            $table->foreignId('metode_pengiriman_id')->constrained('metode_pengiriman');
+            // $table->foreignId('metode_pengiriman_id')->nullable()->constrained('metode_pengiriman')->nullOnDelete();
+            $table->string('metode_pengiriman', 50)->nullable();
             $table->string('nomor_resi', 100)->nullable();
             $table->text('catatan')->nullable();
             $table->text('catatan_admin')->nullable();

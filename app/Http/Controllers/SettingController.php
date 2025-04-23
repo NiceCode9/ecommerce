@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Services\RajaOngkirService;
+use App\Models\Pesanan;
+use App\Models\RiwayatStatusPesanan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -65,5 +67,37 @@ class SettingController extends Controller
                 'message' => $e->getMessage()
             ], 500);
         }
+    }
+
+    public function success(Request $request)
+    {
+        $orderId = $request->query('order_id');
+        $pesanan = Pesanan::where('nomor_pesanan', $orderId)
+            ->with(['pembayaran', 'items'])
+            ->firstOrFail();
+
+        // Update status jika belum terupdate via callback
+        if ($pesanan->status == 'menunggu_pembayaran') {
+            $pesanan->update(['status' => 'diproses']);
+            $pesanan->pembayaran->update(['status' => 'sukses']);
+
+            RiwayatStatusPesanan::create([
+                'pesanan_id' => $pesanan->id,
+                'status' => 'diproses',
+                'catatan' => 'Pembayaran berhasil diverifikasi via Midtrans'
+            ]);
+        }
+
+        return view('front.payment.success', compact('pesanan'));
+    }
+
+    public function failed(Request $request)
+    {
+        $orderId = $request->query('order_id');
+        $pesanan = Pesanan::where('nomor_pesanan', $orderId)
+            ->with(['pembayaran', 'items'])
+            ->firstOrFail();
+
+        return view('front.payment.failed', compact('pesanan'));
     }
 }
