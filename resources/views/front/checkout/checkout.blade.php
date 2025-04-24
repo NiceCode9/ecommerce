@@ -179,14 +179,14 @@
                                 <div class="order-col">
                                     <div>Ongkos Kirim</div>
                                     <div id="shippingCost">Rp 0</div>
+                                    <input type="hidden" name="shipping_cost" value="0">
                                 </div>
 
                                 <div class="order-col">
                                     <div><strong>TOTAL</strong></div>
                                     <div><strong class="order-total" id="grandTotal">Rp
                                             {{ number_format($subtotal, 0, ',', '.') }}</strong></div>
-                                    <input type="hidden" name="shipping_cost" id="shippingCostInput"
-                                        value="{{ $subtotal }}">
+                                    <input type="hidden" name="shipping_cost" id="shippingCostInput" value="0">
                                 </div>
                             </div>
 
@@ -343,8 +343,9 @@
                 const grandTotal = subtotal + parseInt(shippingCost);
 
                 $('#shippingCost').text('Rp ' + shippingCost.toLocaleString('id-ID'));
+                $('input[name="shipping_cost"]').val(shippingCost);
                 $('#grandTotal').text('Rp ' + grandTotal.toLocaleString('id-ID'));
-                $('#shippingCostInput').val(grandTotal);
+                // $('#shippingCostInput').val(grandTotal);
 
                 // Enable submit button
                 $('#submitBtn').prop('disabled', false);
