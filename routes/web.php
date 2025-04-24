@@ -22,6 +22,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/calculate-cost', [SettingController::class, 'calculateShipping'])->name('api.calculate-shipping');
 });
 
+Route::post('midtrans/callback', [App\Http\Controllers\MidtransController::class, 'handleNotification'])->name('midtrans.callback');
+
 require __DIR__ . '/auth.php';
 require __DIR__ . '/admin.php';
 require __DIR__ . '/customer.php';
