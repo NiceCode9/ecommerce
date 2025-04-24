@@ -2,11 +2,11 @@
 
 use App\Http\Controllers\AlamatController;
 use App\Http\Controllers\BrandController;
-use App\Http\Controllers\CheckOutController;
+use App\Http\Controllers\Front\CheckOutController;
 use App\Http\Controllers\Front\CartController;
 use App\Http\Controllers\Front\WishlistController;
 use App\Http\Controllers\KategoriController;
-use App\Http\Controllers\PesananController;
+use App\Http\Controllers\Front\PesananController;
 use App\Http\Controllers\ProdukController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\SocketController;

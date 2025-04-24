@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Front;;
 
+use App\Http\Controllers\Controller;
 use App\Models\{Pesanan, Pembayaran, RiwayatStatusPesanan};
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;

@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Front;;
 
+use App\Http\Controllers\Controller;
 use App\Http\Services\RajaOngkirService;
 use App\Models\Alamat;
 use App\Models\DetailPesanan;

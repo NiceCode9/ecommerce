@@ -158,12 +158,21 @@ scratch. This page gets rid of all links and provides the needed markup only.
                             </ul>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('logout') }}"
-                                class="nav-link" onclick="event.preventDefault(); document.getElementById('form-logout').submit();">
+                            <a href="{{ route('admin.pesanan.index') }}" class="nav-link">
+                                <i class="nav-icon fas fa-shopping-cart"></i>
+                                <p>
+                                    Pesanan
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('logout') }}" class="nav-link"
+                                onclick="event.preventDefault(); document.getElementById('form-logout').submit();">
                                 <i class="fas fa-sign-out-alt nav-icon"></i>
                                 <p>Logout</p>
                             </a>
-                            <form action="{{ route('logout') }}" method="POST" style="display: inline;" id="form-logout">
+                            <form action="{{ route('logout') }}" method="POST" style="display: inline;"
+                                id="form-logout">
                                 @csrf
                             </form>
                         </li>

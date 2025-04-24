@@ -15,18 +15,27 @@ class WishlistController extends Controller
     public function index(Request $request)
     {
         $sortBy = $request->input('sort_by', 'latest');
-        
+
         $wishlists = auth()->user()->wishlists()
             ->with('produk.gambarUtama')
             ->join('produk', 'wishlists.produk_id', '=', 'produk.id')
             ->select('wishlists.*');
 
         switch ($sortBy) {
-            case 'price_asc': $wishlists->orderBy('produk.harga', 'asc'); break;
-            case 'price_desc': $wishlists->orderBy('produk.harga', 'desc'); break;
-            case 'name_asc': $wishlists->orderBy('produk.nama', 'asc'); break;
-            case 'name_desc': $wishlists->orderBy('produk.nama', 'desc'); break;
-            default: $wishlists->latest('wishlists.created_at');
+            case 'price_asc':
+                $wishlists->orderBy('produk.harga', 'asc');
+                break;
+            case 'price_desc':
+                $wishlists->orderBy('produk.harga', 'desc');
+                break;
+            case 'name_asc':
+                $wishlists->orderBy('produk.nama', 'asc');
+                break;
+            case 'name_desc':
+                $wishlists->orderBy('produk.nama', 'desc');
+                break;
+            default:
+                $wishlists->latest('wishlists.created_at');
         }
 
         return view('front.wishlist.wishlist', [
@@ -38,12 +47,12 @@ class WishlistController extends Controller
     public function ajaxIndex()
     {
         $wishlists = auth()->user()->wishlists()
-                        ->with('produk.gambarUtama')
-                        ->paginate(10);
+            ->with('produk.gambarUtama')
+            ->paginate(10);
 
         return view('front.wishlist._items', compact('wishlists'));
     }
-    
+
     public function toggle(Request $request)
     {
         $request->validate([
@@ -69,7 +78,7 @@ class WishlistController extends Controller
     public function remove($id)
     {
         $wishlist = Wishlist::where('pengguna_id', auth()->id())
-                    ->findOrFail($id);
+            ->findOrFail($id);
         $wishlist->delete();
 
         return response()->json([
@@ -82,7 +91,7 @@ class WishlistController extends Controller
     public function sort(Request $request)
     {
         $sortBy = $request->input('sort_by', 'latest');
-        
+
         $wishlists = auth()->user()->wishlists()
             ->with('produk.gambarUtama')
             ->join('produk', 'wishlists.produk_id', '=', 'produk.id')
