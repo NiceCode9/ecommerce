@@ -32,8 +32,8 @@
 
         .product-widget .delete {
             /* position: absolute;
-                                                                                                                                right: 0;
-                                                                                                                                top: 50%; */
+                                                                                                                                                    right: 0;
+                                                                                                                                                    top: 50%; */
             /* transform: translateY(-50%); */
             background: none;
             border: none;
@@ -94,10 +94,10 @@
                                     </td>
                                     <td>
                                         <div class="quantity-control">
-                                            <button class="qty-minus"
+                                            <button type="button" class="qty-minus"
                                                 onclick="updateQuantity({{ $item->id }}, -1)">-</button>
                                             <span class="qty">{{ $item->jumlah }}</span>
-                                            <button class="qty-plus"
+                                            <button type="button" class="qty-plus"
                                                 onclick="updateQuantity({{ $item->id }}, 1)">+</button>
                                         </div>
                                     </td>
@@ -106,7 +106,8 @@
                                         {{ number_format($item->jumlah * $item->produk->harga_setelah_diskon, 0, ',', '.') }}
                                     </td>
                                     <td>
-                                        <button class="remove-item" onclick="removeItem({{ $item->id }})">
+                                        <button class="remove-item" type="button"
+                                            onclick="removeItem({{ $item->id }})">
                                             <i class="fa fa-trash"></i>
                                         </button>
                                     </td>

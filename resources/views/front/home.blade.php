@@ -17,7 +17,8 @@
                         </div>
                         <div class="shop-body">
                             <h3>Laptop<br>Collection</h3>
-                            <a href="#" class="cta-btn">Shop now <i class="fa fa-arrow-circle-right"></i></a>
+                            <a href="{{ route('produk.index') }}" class="cta-btn">Shop now <i
+                                    class="fa fa-arrow-circle-right"></i></a>
                         </div>
                     </div>
                 </div>
@@ -107,7 +108,8 @@
                                             </div>
                                             <div class="product-body">
                                                 <p class="product-category">{{ $product->kategori->nama }}</p>
-                                                <h3 class="product-name"><a href="">{{ $product->nama }}</a>
+                                                <h3 class="product-name"><a
+                                                        href="{{ route('produk.detail', $product->slug) }}">{{ $product->nama }}</a>
                                                 </h3>
                                                 <h4 class="product-price">
                                                     Rp {{ number_format($product->harga_setelah_diskon, 0, ',', '.') }}
@@ -258,7 +260,8 @@
                                             </div>
                                             <div class="product-body">
                                                 <p class="product-category">{{ $product->kategori->nama }}</p>
-                                                <h3 class="product-name"><a href="">{{ $product->nama }}</a>
+                                                <h3 class="product-name"><a
+                                                        href="{{ route('produk.detail', $product->slug) }}">{{ $product->nama }}</a>
                                                 </h3>
                                                 <h4 class="product-price">
                                                     Rp {{ number_format($product->harga_setelah_diskon, 0, ',', '.') }}
@@ -285,7 +288,8 @@
                                                     </button>
                                                     <button class="add-to-compare"><i class="fa fa-exchange"></i><span
                                                             class="tooltipp">add to compare</span></button>
-                                                    <button class="quick-view"><i class="fa fa-eye"></i><span class="tooltipp">quick view</span>
+                                                    <button class="quick-view"><i class="fa fa-eye"></i><span
+                                                            class="tooltipp">quick view</span>
                                                 </div>
                                             </div>
                                             <div class="add-to-cart">

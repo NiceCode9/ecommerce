@@ -34,7 +34,7 @@
                     <div id="product-main-img">
                         @foreach ($product->gambar as $gambar)
                             <div class="product-preview">
-                                <img src="{{ asset('storage/produk/' . $gambar->gambar) }}" alt="{{ $product->nama }}">
+                                <img src="{{ asset('storage/' . $gambar->gambar) }}" alt="{{ $product->nama }}">
                             </div>
                         @endforeach
                     </div>
@@ -46,7 +46,7 @@
                     <div id="product-imgs">
                         @foreach ($product->gambar as $gambar)
                             <div class="product-preview">
-                                <img src="{{ asset('storage/produk/' . $gambar->gambar) }}" alt="{{ $product->nama }}">
+                                <img src="{{ asset('storage/' . $gambar->gambar) }}" alt="{{ $product->nama }}">
                             </div>
                         @endforeach
                     </div>
@@ -218,7 +218,7 @@
                                                     <div class="col-md-3 col-xs-6">
                                                         <div class="product">
                                                             <div class="product-img">
-                                                                <img src="{{ $produkKompatibel->gambarUtama ? asset('storage/produk/' . $produkKompatibel->gambarUtama->gambar) : asset('front/img/no-image.png') }}"
+                                                                <img src="{{ $produkKompatibel->gambarUtama ? asset('storage/' . $produkKompatibel->gambarUtama->gambar) : asset('front/img/no-image.png') }}"
                                                                     alt="{{ $produkKompatibel->nama }}">
                                                             </div>
                                                             <div class="product-body">
@@ -408,7 +408,7 @@
                     <div class="col-md-3 col-xs-6">
                         <div class="product">
                             <div class="product-img">
-                                <img src="{{ $relatedProduct->gambarUtama ? asset('storage/produk/' . $relatedProduct->gambarUtama->gambar) : asset('front/img/no-image.png') }}"
+                                <img src="{{ $relatedProduct->gambarUtama ? asset('storage/' . $relatedProduct->gambarUtama->gambar) : asset('front/img/no-image.png') }}"
                                     alt="{{ $relatedProduct->nama }}">
                                 @if ($relatedProduct->diskon > 0)
                                     <div class="product-label">
@@ -475,7 +475,7 @@
                         <p>This product is compatible with:</p>
                         <div class="product">
                             <div class="product-img">
-                                <img src="{{ $product->motherboard->gambarUtama ? asset('storage/produk/' . $product->motherboard->gambarUtama->gambar) : asset('front/img/no-image.png') }}"
+                                <img src="{{ $product->motherboard->gambarUtama ? asset('storage/' . $product->motherboard->gambarUtama->gambar) : asset('front/img/no-image.png') }}"
                                     alt="{{ $product->motherboard->nama }}">
                             </div>
                             <div class="product-body">

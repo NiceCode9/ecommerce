@@ -2,7 +2,7 @@
     <div class="col-md-4 col-xs-6">
         <div class="product">
             <div class="product-img">
-                <img src="{{ $product->gambarUtama ? asset('storage/produk/' . $product->gambarUtama->gambar) : asset('front/img/no-image.png') }}"
+                <img src="{{ $product->gambarUtama ? asset('storage/' . $product->gambarUtama->gambar) : asset('front/img/no-image.png') }}"
                     alt="{{ $product->nama }}">
                 @if ($product->diskon > 0)
                     <div class="product-label">
