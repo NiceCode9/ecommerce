@@ -17,6 +17,6 @@ class Brand extends Model
     // Relasi dengan produk
     public function produk()
     {
-        return $this->hasMany(Produk::class, 'merk_id');
+        return $this->hasMany(Produk::class, 'brand_id');
     }
 }

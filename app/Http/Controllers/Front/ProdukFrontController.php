@@ -16,7 +16,7 @@ class ProdukFrontController extends Controller
             ->where('is_aktif', true)
             ->withCount('ulasan as ulasan_count')
             ->withAvg('ulasan', 'rating');
-        dd($query->get());
+
         // Filter by categories
         if ($request->has('categories')) {
             $query->whereIn('kategori_id', $request->categories);
@@ -58,6 +58,7 @@ class ProdukFrontController extends Controller
         if ($request->ajax()) {
             return response()->json([
                 'html' => view('front.partials.produk-list', compact('products'))->render(),
+                'pagination' => $products->appends(request()->query())->links('front.pagination')->render(),
                 'showing' => $products->count(),
                 'total' => $products->total()
             ]);
@@ -82,6 +83,56 @@ class ProdukFrontController extends Controller
         return view('front.products.store', compact('products', 'categories', 'brands', 'maxPrice', 'topSelling'));
     }
 
+    // public function show($slug)
+    // {
+    //     $product = Produk::with([
+    //         'kategori',
+    //         'brand',
+    //         'gambar',
+    //         'spesifikasi',
+    //         'motherboard',
+    //         'kompatibel_dengan_motherboard_ini' => function ($query) {
+    //             $query->with('gambarUtama')->where('is_aktif', true);
+    //         },
+    //         'ulasan' => function ($query) {
+    //             $query->with('pengguna')->latest();
+    //         }
+    //     ])
+    //         ->withAvg('ulasan', 'rating')
+    //         ->where('slug', $slug)
+    //         ->where('is_aktif', true)
+    //         ->firstOrFail();
+
+    //     // Increment view count
+    //     $product->increment('dilihat');
+
+    //     // Get related products
+    //     $relatedProducts = Produk::with('gambarUtama')
+    //         ->where('kategori_id', $product->kategori_id)
+    //         ->where('id', '!=', $product->id)
+    //         ->where('is_aktif', true)
+    //         ->inRandomOrder()
+    //         ->take(4)
+    //         ->get();
+
+    //     // Check if user has purchased this product (for review)
+    //     $pesananId = null;
+    //     if (auth()->check()) {
+    //         $pesanan = auth()->user()->pesanan()
+    //             ->whereHas('detailPesanan', function ($query) use ($product) {
+    //                 $query->where('produk_id', $product->id);
+    //             })
+    //             ->where('status', 'selesai')
+    //             ->first();
+
+    //         if ($pesanan) {
+    //             $pesananId = $pesanan->id;
+    //         }
+    //     }
+
+    //     return view('front.products.detail-produk', compact('product', 'relatedProducts', 'pesananId'));
+    // }
+
     public function show($slug)
     {
         $product = Produk::with([
@@ -92,11 +143,9 @@ class ProdukFrontController extends Controller
             'motherboard',
             'kompatibel_dengan_motherboard_ini' => function ($query) {
                 $query->with('gambarUtama')->where('is_aktif', true);
-            },
-            'ulasan' => function ($query) {
-                $query->with('pengguna')->latest();
             }
         ])
+            ->withCount('ulasan')
             ->withAvg('ulasan', 'rating')
             ->where('slug', $slug)
             ->where('is_aktif', true)
@@ -114,6 +163,13 @@ class ProdukFrontController extends Controller
             ->take(4)
             ->get();
 
+        // Paginate reviews
+        $perPage = request('per_page', 5); // Default 5 reviews per page
+        $ulasan = $product->ulasan()
+            ->with('pengguna')
+            ->latest()
+            ->paginate($perPage);
+
         // Check if user has purchased this product (for review)
         $pesananId = null;
         if (auth()->check()) {
@@ -129,7 +185,12 @@ class ProdukFrontController extends Controller
             }
         }
 
-        return view('front.products.detail-produk', compact('product', 'relatedProducts', 'pesananId'));
+        return view('front.products.detail-produk', compact(
+            'product',
+            'relatedProducts',
+            'pesananId',
+            'ulasan'
+        ));
     }
 
     public function byCategory($slug)
@@ -143,12 +204,19 @@ class ProdukFrontController extends Controller
             ->withAvg('ulasan', 'rating')
             ->paginate(12);
 
+        $topSelling = Produk::with('gambarUtama')
+            ->where('is_aktif', true)
+            ->orderBy('dilihat', 'desc')
+            ->take(3)
+            ->get();
+
         return view('front.products.store', [
             'products' => $products,
             'category' => $category,
             'categories' => Kategori::withCount('produk')->get(),
             'brands' => Brand::withCount('produk')->get(),
-            'maxPrice' => Produk::max('harga_setelah_diskon')
+            'maxPrice' => Produk::max('harga_setelah_diskon'),
+            'topSelling' => $topSelling,
         ]);
     }
 
@@ -163,12 +231,19 @@ class ProdukFrontController extends Controller
             ->withAvg('ulasan', 'rating')
             ->paginate(12);
 
+        $topSelling = Produk::with('gambarUtama')
+            ->where('is_aktif', true)
+            ->orderBy('dilihat', 'desc')
+            ->take(3)
+            ->get();
+
         return view('front.products.store', [
             'products' => $products,
             'brand' => $brand,
             'categories' => Kategori::withCount('produk')->get(),
             'brands' => Brand::withCount('produk')->get(),
-            'maxPrice' => Produk::max('harga_setelah_diskon')
+            'maxPrice' => Produk::max('harga_setelah_diskon'),
+            'topSelling' => $topSelling,
         ]);
     }
 }

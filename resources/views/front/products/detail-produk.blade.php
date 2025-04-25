@@ -117,7 +117,7 @@
                                         <span class="qty-down">-</span>
                                     </div>
                                 </div>
-                                <button class="add-to-cart-btn" onclick="addToCart({{ $product->id }})">
+                                <button class="add-to-cart-btn" onclick="addToCart({{ $product->id }}, $('#qty').val())">
                                     <i class="fa fa-shopping-cart"></i> add to cart
                                 </button>
                             </div>
@@ -125,7 +125,7 @@
 
                         <ul class="product-btns">
                             <li>
-                                <a href="#" onclick="addToWishlist({{ $product->id }})">
+                                <a href="#" onclick="toggleWishlist({{ $product->id }})">
                                     <i class="fa fa-heart-o"></i> add to wishlist
                                 </a>
                             </li>
@@ -327,7 +327,9 @@
                                                     </li>
                                                 @endforeach
                                             </ul>
-                                            {{ $product->ulasan->links('front.partials.pagination') }}
+                                            <div class="reviews-pagination">
+                                                {{ $ulasan->appends(request()->query())->links('front.pagination') }}
+                                            </div>
                                         </div>
                                     </div>
                                     <!-- /Reviews -->
@@ -438,7 +440,8 @@
                                     @endfor
                                 </div>
                                 <div class="product-btns">
-                                    <button class="add-to-wishlist" onclick="addToWishlist({{ $relatedProduct->id }})"><i
+                                    <button class="add-to-wishlist"
+                                        onclick="toggleWishlist({{ $relatedProduct->id }})"><i
                                             class="fa fa-heart-o"></i><span class="tooltipp">add to
                                             wishlist</span></button>
                                     <button class="quick-view"
@@ -497,54 +500,35 @@
 
 @push('front-script')
     <script>
-        function addToCart(productId) {
-            const quantity = $('#qty').val();
-            $.ajax({
-                url: '{{ route('cart.add') }}',
-                type: 'POST',
-                data: {
-                    _token: '{{ csrf_token() }}',
-                    product_id: productId,
-                    quantity: quantity
-                },
-                success: function(response) {
-                    updateCartCount(response.cartCount, response.cartTotal);
-                    showToast('Product added to cart successfully');
-                },
-                error: function(xhr) {
-                    showToast(xhr.responseJSON.message, 'error');
-                }
-            });
-        }
+        $(document).ready(function() {
+            // Handle pagination for reviews
+            $(document).on('click', '.reviews-pagination a', function(e) {
+                e.preventDefault();
 
-        function addToWishlist(productId) {
-            $.ajax({
-                url: '{{ route('wishlist.add') }}',
-                type: 'POST',
-                data: {
-                    _token: '{{ csrf_token() }}',
-                    product_id: productId
-                },
-                success: function(response) {
-                    updateWishlistCount(response.wishlistCount);
-                    showToast('Product added to wishlist successfully');
-                },
-                error: function(xhr) {
-                    showToast(xhr.responseJSON.message, 'error');
-                }
-            });
-        }
+                // Get the page URL
+                const url = $(this).attr('href');
 
-        function showToast(message, type = 'success') {
-            const toast = $(`
-            <div class="toast ${type === 'error' ? 'error' : ''}">
-                ${message}
-            </div>
-        `);
-            $('body').append(toast);
-            setTimeout(() => {
-                toast.remove();
-            }, 3000);
-        }
+                // Show loading indicator if needed
+                $('#ajax-loader').show();
+
+                // Load the reviews via AJAX
+                $.ajax({
+                    url: url,
+                    type: 'GET',
+                    success: function(response) {
+                        // Replace the reviews section
+                        $('#reviews').html($(response).find('#reviews').html());
+
+                        // Scroll to reviews section
+                        $('html, body').animate({
+                            scrollTop: $('#reviews-tab').offset().top - 100
+                        }, 500);
+                    },
+                    complete: function() {
+                        $('#ajax-loader').hide();
+                    }
+                });
+            });
+        });
     </script>
 @endpush

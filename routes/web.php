@@ -23,14 +23,15 @@ Route::middleware('auth')->group(function () {
     Route::get('/get-wilayah', [SettingController::class, 'getWilayah'])->name('api.getwilayah');
     Route::get('/calculate-cost', [SettingController::class, 'calculateShipping'])->name('api.calculate-shipping');
 
-    Route::get('/produk', [ProdukFrontController::class, 'index'])->name('produk.index');
-    Route::get('/produk/{id}', [ProdukFrontController::class, 'show'])->name('produk.detail');
-    Route::get('/produk/kategori/{id}', [ProdukFrontController::class, 'byCategory'])->name('produk.kategori');
-    Route::get('/produk/brand/{id}', [ProdukFrontController::class, 'byBrand'])->name('produk.brand');
 
     Route::post('/produk/{produkId}/ulasan', [UlasanController::class, 'store'])->name('produk.ulasan.store');
     Route::post('/produk/ulasan/{ulasanId}/reply', [UlasanController::class, 'reply'])->name('produk.ulasan.reply');
 });
+
+Route::get('/produk', [ProdukFrontController::class, 'index'])->name('produk.index');
+Route::get('/produk/{id}', [ProdukFrontController::class, 'show'])->name('produk.detail');
+Route::get('/produk/kategori/{id}', [ProdukFrontController::class, 'byCategory'])->name('produk.kategori');
+Route::get('/produk/brand/{id}', [ProdukFrontController::class, 'byBrand'])->name('produk.brand');
 
 Route::post('midtrans/callback', [App\Http\Controllers\MidtransController::class, 'handleNotification'])->name('midtrans.callback');
 

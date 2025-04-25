@@ -1,5 +1,32 @@
 @extends('front.layouts.main')
 
+@push('style')
+    <style>
+        .price-filter {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .price-filter .input-number {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .price-filter label {
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .price-filter input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #e4e4e4;
+            border-radius: 4px;
+        }
+    </style>
+@endpush
+
 @section('title', 'Shop - ' . config('app.name'))
 
 @section('content')
@@ -36,7 +63,7 @@
                                     <label for="category-{{ $category->id }}">
                                         <span></span>
                                         {{ $category->nama }}
-                                        <small>({{ $category->products_count }})</small>
+                                        <small>({{ $category->produk_count }})</small>
                                     </label>
                                 </div>
                             @endforeach
@@ -48,19 +75,16 @@
                     <div class="aside">
                         <h3 class="aside-title">Price</h3>
                         <div class="price-filter">
-                            <div id="price-slider"></div>
                             <div class="input-number price-min">
+                                <label for="price-min">Min Price:</label>
                                 <input id="price-min" type="number" name="min_price" value="{{ request('min_price', 0) }}"
-                                    onchange="filterProducts()">
-                                <span class="qty-up">+</span>
-                                <span class="qty-down">-</span>
+                                    min="0" max="{{ $maxPrice }}" onchange="filterProducts()">
                             </div>
-                            <span>-</span>
                             <div class="input-number price-max">
+                                <label for="price-max">Max Price:</label>
                                 <input id="price-max" type="number" name="max_price"
-                                    value="{{ request('max_price', $maxPrice) }}" onchange="filterProducts()">
-                                <span class="qty-up">+</span>
-                                <span class="qty-down">-</span>
+                                    value="{{ request('max_price', $maxPrice) }}" min="0" max="{{ $maxPrice }}"
+                                    onchange="filterProducts()">
                             </div>
                         </div>
                     </div>
@@ -191,7 +215,7 @@
                                         </div>
                                         <div class="product-btns">
                                             <button class="add-to-wishlist"
-                                                onclick="addToWishlist({{ $product->id }})"><i
+                                                onclick="toggleWishlist({{ $product->id }})"><i
                                                     class="fa fa-heart-o"></i><span class="tooltipp">add to
                                                     wishlist</span></button>
                                             <button class="quick-view"
@@ -211,11 +235,20 @@
                     <!-- /store products -->
 
                     <!-- store bottom filter -->
-                    <div class="store-filter clearfix">
+                    {{-- <div class="store-filter clearfix">
                         <span class="store-qty">Showing {{ $products->firstItem() }}-{{ $products->lastItem() }} of
                             {{ $products->total() }} products</span>
                         {{ $products->appends(request()->query())->links('front.pagination') }}
-                    </div>
+                    </div> --}}
+                    @if ($products->hasPages())
+                        <div class="store-filter clearfix">
+                            <span class="store-qty">Showing {{ $products->firstItem() }}-{{ $products->lastItem() }} of
+                                {{ $products->total() }} products</span>
+                            <div id="pagination-container">
+                                {{ $products->appends(request()->query())->links('front.pagination') }}
+                            </div>
+                        </div>
+                    @endif
                     <!-- /store bottom filter -->
                 </div>
                 <!-- /STORE -->
@@ -227,40 +260,6 @@
 
 @push('front-script')
     <script>
-        // Initialize price slider
-        const priceSlider = document.getElementById('price-slider');
-        const minPrice = {{ request('min_price', 0) }};
-        const maxPrice = {{ request('max_price', $maxPrice) }};
-        const absoluteMaxPrice = {{ $maxPrice }};
-
-        noUiSlider.create(priceSlider, {
-            start: [minPrice, maxPrice],
-            connect: true,
-            range: {
-                'min': 0,
-                'max': absoluteMaxPrice
-            },
-            step: 100000,
-            format: {
-                to: function(value) {
-                    return Math.round(value);
-                },
-                from: function(value) {
-                    return Number(value);
-                }
-            }
-        });
-
-        priceSlider.noUiSlider.on('update', function(values, handle) {
-            const value = values[handle];
-            if (handle) {
-                document.getElementById('price-max').value = value;
-            } else {
-                document.getElementById('price-min').value = value;
-            }
-            filterProducts();
-        });
-
         function filterProducts() {
             const formData = {
                 categories: [],
@@ -288,8 +287,12 @@
                 data: formData,
                 success: function(response) {
                     $('#product-list').html(response.html);
+                    $('#pagination-container').html(response.pagination);
                     $('.store-qty').text('Showing ' + response.showing + ' of ' + response.total + ' products');
                     history.pushState(null, null, '?' + $.param(formData));
+
+                    // Re-attach event handlers for new pagination links
+                    attachPaginationHandlers();
                 },
                 complete: function() {
                     $('#ajax-loader').hide();
@@ -297,53 +300,50 @@
             });
         }
 
-        function addToCart(productId) {
-            $.ajax({
-                url: '{{ route('cart.add') }}',
-                type: 'POST',
-                data: {
-                    _token: '{{ csrf_token() }}',
-                    product_id: productId,
-                    quantity: 1
-                },
-                success: function(response) {
-                    updateCartCount(response.cartCount, response.cartTotal);
-                    showToast('Product added to cart successfully');
-                },
-                error: function(xhr) {
-                    showToast(xhr.responseJSON.message, 'error');
-                }
+        function attachPaginationHandlers() {
+            $(document).off('click', '.pagination a').on('click', '.pagination a', function(e) {
+                e.preventDefault();
+
+                // Get the page URL
+                const url = $(this).attr('href');
+
+                // Show loading
+                $('#ajax-loader').show();
+
+                $.ajax({
+                    url: url,
+                    type: 'GET',
+                    success: function(response) {
+                        $('#product-list').html(response.html);
+                        $('#pagination-container').html(response.pagination);
+                        $('.store-qty').text('Showing ' + response.showing + ' of ' + response.total +
+                            ' products');
+                    },
+                    complete: function() {
+                        $('#ajax-loader').hide();
+                    }
+                });
             });
         }
 
-        function addToWishlist(productId) {
-            $.ajax({
-                url: '{{ route('wishlist.add') }}',
-                type: 'POST',
-                data: {
-                    _token: '{{ csrf_token() }}',
-                    product_id: productId
-                },
-                success: function(response) {
-                    updateWishlistCount(response.wishlistCount);
-                    showToast('Product added to wishlist successfully');
-                },
-                error: function(xhr) {
-                    showToast(xhr.responseJSON.message, 'error');
+        // Initialize on page load
+        $(document).ready(function() {
+            attachPaginationHandlers();
+
+            // Validasi input harga
+            document.getElementById('price-min').addEventListener('change', function() {
+                const maxPrice = document.getElementById('price-max');
+                if (parseInt(this.value) > parseInt(maxPrice.value)) {
+                    maxPrice.value = this.value;
                 }
             });
-        }
 
-        function showToast(message, type = 'success') {
-            const toast = $(`
-            <div class="toast ${type === 'error' ? 'error' : ''}">
-                ${message}
-            </div>
-        `);
-            $('body').append(toast);
-            setTimeout(() => {
-                toast.remove();
-            }, 3000);
-        }
+            document.getElementById('price-max').addEventListener('change', function() {
+                const minPrice = document.getElementById('price-min');
+                if (parseInt(this.value) < parseInt(minPrice.value)) {
+                    minPrice.value = this.value;
+                }
+            });
+        });
     </script>
 @endpush
