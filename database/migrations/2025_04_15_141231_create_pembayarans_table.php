@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('metode', 100);
             $table->string('gateway_id', 255)->nullable()->comment('ID transaksi dari payment gateway');
             $table->decimal('jumlah', 15, 2);
-            $table->enum('status', ['pending', 'sukses', 'gagal', 'expired', 'refund'])->default('pending');
+            $table->enum('status', ['pending', 'sukses', 'gagal', 'expired', 'refund'], 'pending_verification')->default('pending');
             $table->timestamp('waktu_dibayar')->nullable();
             $table->string('url_checkout')->nullable();
             $table->json('response_data')->nullable();
