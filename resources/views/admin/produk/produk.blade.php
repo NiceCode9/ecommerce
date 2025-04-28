@@ -37,6 +37,7 @@
                                     <th>Brand</th>
                                     <th>Garansi</th>
                                     <th>Harga</th>
+                                    <th>Harga Diskon</th>
                                     <th>Stok</th>
                                     <th>Diskon</th>
                                     <th>Berat</th>
@@ -56,6 +57,7 @@
                                         <td>{{ $product->brand->nama }}</td>
                                         <td>{{ $product->garani }} Bulan</td>
                                         <td>Rp {{ number_format($product->harga, 0, ',', '.') }}</td>
+                                        <td>Rp {{ number_format($product->harga_setelah_diskon, 0, ',', '.') }}</td>
                                         <td>{{ $product->stok }}</td>
                                         <td>{{ $product->diskon }} %</td>
                                         <td>{{ $product->berat }}</td>

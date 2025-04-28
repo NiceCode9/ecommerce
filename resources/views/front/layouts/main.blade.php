@@ -368,7 +368,7 @@
 
                     <!-- SEARCH BAR -->
                     <div class="col-md-4">
-                        <div class="header-search">
+                        {{-- <div class="header-search">
                             <form>
                                 <select class="input-select">
                                     <option value="0">All Categories</option>
@@ -378,7 +378,7 @@
                                 <input class="input" placeholder="Search here">
                                 <button class="search-btn">Search</button>
                             </form>
-                        </div>
+                        </div> --}}
                     </div>
                     <!-- /SEARCH BAR -->
 
@@ -458,13 +458,10 @@
             <div id="responsive-nav">
                 <!-- NAV -->
                 <ul class="main-nav nav navbar-nav">
-                    <li class="active"><a href="#">Home</a></li>
-                    <li><a href="#">Hot Deals</a></li>
-                    <li><a href="#">Categories</a></li>
-                    <li><a href="#">Laptops</a></li>
-                    <li><a href="#">Smartphones</a></li>
-                    <li><a href="#">Cameras</a></li>
-                    <li><a href="#">Accessories</a></li>
+                    <li class="{{ request()->routeIs('home') ? 'active' : '' }}"><a
+                            href="{{ route('home') }}">Home</a></li>
+                    <li class="{{ request()->routeIs('produk.*') ? 'active' : '' }}"><a
+                            href="{{ route('produk.index') }}">Produk</a></li>
                 </ul>
                 <!-- /NAV -->
             </div>
