@@ -29,7 +29,6 @@ class CheckOutController extends Controller
 
         $user = auth()->user();
 
-        // Ambil item cart yang dipilih
         $cartItems = $user->carts()
             ->whereIn('id', $cartIds)
             ->with('produk')
@@ -61,7 +60,6 @@ class CheckOutController extends Controller
 
     public function process(Request $request)
     {
-        // dd($request->all());
         $request->validate([
             'cart_ids' => 'required',
             'alamat_id' => 'required|exists:alamat,id,pengguna_id,' . auth()->id(),
@@ -73,7 +71,6 @@ class CheckOutController extends Controller
         DB::beginTransaction();
         try {
             $cartIds = json_decode($request->cart_ids, true);
-            // 1. Get Cart Items
             $carts = auth()->user()->carts()
                 ->whereIn('id', $cartIds)
                 ->with('produk')
@@ -83,15 +80,17 @@ class CheckOutController extends Controller
                 throw new \Exception("Keranjang belanja kosong");
             }
 
-            // 2. Create Order
+            $totalProduk = $carts->sum(fn($item) => $item->produk->harga_setelah_diskon * $item->jumlah);
+            $totalBayar = $totalProduk + $request->shipping_cost;
+
             $pesanan = Pesanan::create([
                 'nomor_pesanan' => 'INV-' . time() . '-' . auth()->id(),
                 'pengguna_id' => auth()->id(),
                 'alamat_pengiriman_id' => $request->alamat_id,
                 'metode_pengiriman' => $request->shipping_name, // Default, bisa disesuaikan
                 'biaya_pengiriman' => $request->shipping_cost,
-                'total_harga' => $carts->sum(fn($item) => $item->produk->harga_setelah_diskon * $item->jumlah),
-                'total_bayar' => $carts->sum(fn($item) => $item->produk->harga_setelah_diskon * $item->jumlah) + $request->shipping_cost,
+                'total_harga' => $totalProduk,
+                'total_bayar' => $totalBayar,
                 'status' => $request->payment_method == 'cod' ? 'menunggu_pembayaran' : 'menunggu_pembayaran'
             ]);
 
@@ -107,7 +106,6 @@ class CheckOutController extends Controller
                 ]);
             }
 
-            // 4. Create Payment
             $pembayaran = Pembayaran::create([
                 'pesanan_id' => $pesanan->id,
                 'kode_pembayaran' => 'PAY-' . time() . '-' . auth()->id(),
@@ -117,7 +115,6 @@ class CheckOutController extends Controller
                 'expired_at' => now()->addHours(24)
             ]);
 
-            // 5. Create Status History
             RiwayatStatusPesanan::create([
                 'pesanan_id' => $pesanan->id,
                 'status' => 'menunggu_pembayaran',
@@ -126,9 +123,8 @@ class CheckOutController extends Controller
 
             // 6. Process Payment
             if ($request->payment_method == 'midtrans') {
-                $paymentUrl = $this->generateMidtransPayment($pesanan);
+                $paymentUrl = $this->generateMidtransPayment($pesanan, $request->shipping_cost);
                 $pembayaran->update(['url_checkout' => $paymentUrl]);
-                // dd($paymentUrl);
             }
 
             // 7. Clear Cart
@@ -147,30 +143,69 @@ class CheckOutController extends Controller
         }
     }
 
-    private function generateMidtransPayment($pesanan)
+    private function generateMidtransPayment($pesanan, $shippingCost)
     {
         Config::$serverKey = config('services.midtrans.server_key');
         Config::$isProduction = config('services.midtrans.is_production');
         Config::$isSanitized = true;
+        Config::$is3ds = true;
+
+        $itemDetails = $pesanan->detailPesanan->map(function ($item) {
+            // Potong nama produk jika lebih dari 50 karakter
+            $itemName = strlen($item->nama_produk) > 50
+                ? substr($item->nama_produk, 0, 47) . '...'
+                : $item->nama_produk;
+
+            return [
+                'id' => $item->produk_id,
+                'price' => (int) $item->harga,
+                'quantity' => (int) $item->jumlah,
+                'name' => $itemName
+            ];
+        })->toArray();
+
+        if ($shippingCost > 0) {
+            $itemDetails[] = [
+                'id' => 'SHIPPING-' . $pesanan->id,
+                'price' => (int) $shippingCost,
+                'quantity' => 1,
+                'name' => 'Ongkos Kirim (' . $pesanan->metode_pengiriman . ')'
+            ];
+        }
+
+        $grossAmount = array_reduce($itemDetails, function ($total, $item) {
+            return $total + ($item['price'] * $item['quantity']);
+        }, 0);
 
         $params = [
             'transaction_details' => [
                 'order_id' => $pesanan->nomor_pesanan,
-                'gross_amount' => $pesanan->total_bayar,
+                'gross_amount' => $grossAmount,
             ],
             'customer_details' => [
                 'first_name' => auth()->user()->name,
                 'email' => auth()->user()->email,
                 'phone' => auth()->user()->nomor_telepon,
             ],
-            'item_details' => $pesanan->detailPesanan->map(fn($item) => [
-                'id' => $item->produk_id,
-                'price' => $item->harga,
-                'quantity' => $item->jumlah,
-                'name' => $item->nama_produk
-            ])
+            // 'item_details' => $pesanan->detailPesanan->map(fn($item) => [
+            //     'id' => $item->produk_id,
+            //     'price' => $item->harga,
+            //     'quantity' => $item->jumlah,
+            //     'name' => $item->nama_produk
+            // ])
+            'item_details' => $itemDetails,
+            'expiry' => [
+                'unit' => 'hour',
+                'duration' => 24
+            ]
         ];
 
-        return Snap::createTransaction($params)->redirect_url;
+        try {
+            // $snapToken = Snap::getSnapToken($params);
+            // return Snap::getSnapUrl($snapToken);
+            return Snap::createTransaction($params)->redirect_url;
+        } catch (\Exception $e) {
+            throw new \Exception("Gagal membuat pembayaran Midtrans: " . $e->getMessage());
+        }
     }
 }

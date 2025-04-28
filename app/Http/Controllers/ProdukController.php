@@ -105,9 +105,8 @@ class ProdukController extends Controller
         if ($kategori) {
             if ($kategori->tipe == 'processor' || $kategori->tipe == 'motherboard') {
                 $validationRules['socket_id'] = 'required|exists:sockets,id';
-                // motherboard tidak memerlukan mobo_id
-            } else {
-                // Untuk RAM dan komponen lain
+            }
+            if ($kategori->tipe == 'memory') {
                 $validationRules['mobo_id'] = 'required|exists:produk,id';
             }
         }
@@ -115,7 +114,13 @@ class ProdukController extends Controller
         $request->validate($validationRules);
 
         // Proses pembuatan produk
-        $request->merge(['nama' => $request->input('nama_produk')]);
+        $harga_setelah_diskon = $request->diskon > 0
+            ? $request->harga - ($request->harga * $request->diskon / 100)
+            : $request->harga;
+        $request->merge([
+            'nama' => $request->input('nama_produk'),
+            'harga_setelah_diskon' => $harga_setelah_diskon
+        ]);
 
         // Mengelola data input spesifikasi
         $spesifikasi = [];
@@ -241,7 +246,8 @@ class ProdukController extends Controller
         if ($kategori) {
             if ($kategori->tipe == 'processor' || $kategori->tipe == 'motherboard') {
                 $validationRules['socket_id'] = 'required|exists:sockets,id';
-            } else {
+            }
+            if ($kategori->tipe == 'memory') {
                 $validationRules['mobo_id'] = 'required|exists:produk,id';
             }
         }
@@ -249,7 +255,13 @@ class ProdukController extends Controller
         $request->validate($validationRules);
 
         // Proses update produk
-        $request->merge(['nama' => $request->input('nama_produk')]);
+        $harga_setelah_diskon = $request->diskon > 0
+            ? $request->harga - ($request->harga * $request->diskon / 100)
+            : $request->harga;
+        $request->merge([
+            'nama' => $request->input('nama_produk'),
+            'harga_setelah_diskon' => $harga_setelah_diskon
+        ]);
 
         // Mengelola data input spesifikasi
         $spesifikasi = [];
@@ -423,8 +435,8 @@ class ProdukController extends Controller
     public function quickView($id)
     {
         $product = Produk::with(['gambarUtama', 'kategori', 'gambar'])
-        ->findOrFail($id);
-            
+            ->findOrFail($id);
+
         return view('front.products.quick-view', compact('product'));
     }
 }

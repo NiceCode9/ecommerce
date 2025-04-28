@@ -66,7 +66,7 @@
                             @enderror
                         </div>
                         <div class="form-group">
-                            <label for="berat">Berat (gram)</label>
+                            <label for="berat">Berat (kg)</label>
                             <input type="number" name="berat" id="berat"
                                 class="form-control @error('berat') is-invalid @enderror" step="0.01"
                                 value="{{ old('berat') }}">

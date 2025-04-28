@@ -20,7 +20,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        \App\Models\Produk::observe(\App\Observers\ProdukObserver::class);
+        // Produk::observe(\App\Observers\ProdukObserver::class);
         Schema::defaultStringLength(191);
     }
 }
