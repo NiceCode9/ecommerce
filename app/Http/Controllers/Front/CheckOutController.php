@@ -115,16 +115,22 @@ class CheckOutController extends Controller
                 'expired_at' => now()->addHours(24)
             ]);
 
-            RiwayatStatusPesanan::create([
-                'pesanan_id' => $pesanan->id,
-                'status' => 'menunggu_pembayaran',
-                'catatan' => 'Pesanan dibuat'
-            ]);
 
             // 6. Process Payment
             if ($request->payment_method == 'midtrans') {
                 $paymentUrl = $this->generateMidtransPayment($pesanan, $request->shipping_cost);
                 $pembayaran->update(['url_checkout' => $paymentUrl]);
+                RiwayatStatusPesanan::create([
+                    'pesanan_id' => $pesanan->id,
+                    'status' => 'menunggu_pembayaran',
+                    'catatan' => 'Pesanan dibuat'
+                ]);
+            } else {
+                RiwayatStatusPesanan::create([
+                    'pesanan_id' => $pesanan->id,
+                    'status' => 'diproses',
+                    'catatan' => 'Pesanan dibuat'
+                ]);
             }
 
             // 7. Clear Cart

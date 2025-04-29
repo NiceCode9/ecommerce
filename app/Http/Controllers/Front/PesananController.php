@@ -47,26 +47,38 @@ class PesananController extends Controller
             'bukti_pembayaran' => 'required|image|max:2048'
         ]);
 
-        $pesanan = auth()->user()->pesanan()
-            ->with('pembayaran')
-            ->findOrFail($id);
+        DB::beginTransaction();
+        try {
+            $pesanan = auth()->user()->pesanan()
+                ->with('pembayaran')
+                ->findOrFail($id);
 
-        // Upload bukti pembayaran
-        $path = $request->file('bukti_pembayaran')->store('bukti_pembayaran', 'public');
+            // Upload bukti pembayaran
+            $path = $request->file('bukti_pembayaran')->store('bukti_pembayaran', 'public');
 
-        // Update status
-        $pesanan->pembayaran->update([
-            'status' => 'pending_verification',
-            'response_data' => ['bukti_pembayaran' => $path]
-        ]);
+            // Update status
+            $pesanan->update([
+                'status' => 'selesai',
+            ]);
+            $pesanan->pembayaran->update([
+                'status' => 'sukses',
+                'response_data' => ['bukti_pembayaran' => $path]
+            ]);
 
-        RiwayatStatusPesanan::create([
-            'pesanan_id' => $pesanan->id,
-            'status' => 'menunggu_verifikasi',
-            'catatan' => 'Bukti pembayaran COD diunggah'
-        ]);
+            RiwayatStatusPesanan::create([
+                'pesanan_id' => $pesanan->id,
+                'status' => 'menunggu_verifikasi',
+                'catatan' => 'Bukti pembayaran COD diunggah'
+            ]);
 
-        return redirect()->route('pelanggan.pesanan.show', $pesanan->id)
-            ->with('success', 'Bukti pembayaran berhasil diunggah. Menunggu verifikasi admin.');
+            DB::commit();
+            return redirect()->route('pelanggan.pesanan.show', $pesanan->id)
+                ->with('success', 'Bukti pembayaran berhasil diunggah. Menunggu verifikasi admin.');
+        } catch (\Throwable $th) {
+            //throw $th;
+            DB::rollBack();
+            return redirect()->route('pelanggan.pesanan.show', $pesanan->id)
+                ->with('error', 'Gagal mengunggah bukti pembayaran.');
+        }
     }
 }
