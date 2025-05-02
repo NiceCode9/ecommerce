@@ -58,8 +58,8 @@ class SimulasiController extends Controller
             }
 
             if ($type === 'ram' && $request->motherboard_id) {
-                $mobo = Produk::find($request->motherboard_id);
-                $query->where('tipe_ram', $mobo->tipe_ram);
+                // $mobo = Produk::find($request->motherboard_id);
+                $query->where('mobo_id', $request->motherboard_id);
             }
         }
 
@@ -114,7 +114,7 @@ class SimulasiController extends Controller
                 'total_price' => $totalPrice,
                 'mode' => $request->mode,
                 'status' => 'draft',
-                'is_public' => $request->is_public ?? false,
+                // 'is_public' => $request->is_public ?? false,
             ]);
 
             // Add components to the build

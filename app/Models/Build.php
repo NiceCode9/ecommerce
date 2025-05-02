@@ -23,7 +23,6 @@ class Build extends Model
 
     protected $casts = [
         'total_price' => 'decimal:2',
-        'is_public' => 'boolean'
     ];
 
     public function components()

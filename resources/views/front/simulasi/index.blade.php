@@ -271,7 +271,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <button id="save-build" class="btn btn-primary mt-3" disabled>
+                            <button id="save-build" class="btn btn-primary mt-3">
                                 Simpan Rakitan
                             </button>
                         </form>
@@ -562,6 +562,7 @@
             }
 
             async function saveBuild() {
+                if (!checkAuth()) return;
                 try {
 
                     const buildData = {
@@ -597,7 +598,7 @@
                         }
                     });
 
-                    const response = await $.ajax({
+                    const response = await ajaxRequest({
                         url: '/simulasi/save',
                         method: 'POST',
                         data: buildData,
@@ -608,7 +609,8 @@
 
                     if (response.success) {
                         alert(response.message);
-                        window.location.href = '/simulasi/list'; // Redirect ke daftar rakitan
+                        // window.location.href = '/simulasi/list'; // Redirect ke daftar rakitan
+                        window.location.href = '/simulasi'
                     } else {
                         throw new Error(response.message);
                     }

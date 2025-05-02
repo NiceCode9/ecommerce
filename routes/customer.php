@@ -9,8 +9,13 @@ use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\Front\PesananController;
 use App\Http\Controllers\ProdukController;
 use App\Http\Controllers\SettingController;
+use App\Http\Controllers\SimulasiController;
 use App\Http\Controllers\SocketController;
 use Illuminate\Support\Facades\Route;
+
+Route::get('/simulasi', [SimulasiController::class, 'index'])->name('simulasi.index');
+Route::get('/simulasi/api/components/{type}', [SimulasiController::class, 'getComponents'])->name('simulasi.getComponents');
+Route::get('/simulasi/api/sockets', [SimulasiController::class, 'getSockets'])->name('simulasi.getSockets');
 
 Route::middleware(['auth', 'checkrole:pelanggan'])
     ->name('pelanggan.')
@@ -45,4 +50,8 @@ Route::middleware(['auth', 'checkrole:pelanggan'])
             ->name('pesanan.confirm-cod');
         Route::get('/payment/success', [SettingController::class, 'success'])->name('payment.success');
         Route::get('/payment/failed', [SettingController::class, 'failed'])->name('payment.failed');
+
+        // Route::prefix('simulasi')->group(function () {
+        Route::post('/simulasi/save', [SimulasiController::class, 'saveBuild'])->name('simulasi.save');
+        // });
     });
