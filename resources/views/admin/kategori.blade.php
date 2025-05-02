@@ -18,6 +18,7 @@
                             <thead>
                                 <tr>
                                     <th>No</th>
+                                    <th>Parent Kategori</th>
                                     <th>Nama Kategori</th>
                                     <th>Slug</th>
                                     <th>Tipe</th>
@@ -28,6 +29,7 @@
                                 @foreach ($kategori as $k)
                                     <tr>
                                         <td>{{ $loop->iteration }}</td>
+                                        <td>{{ $k->parent ? $k->parent->nama : '-' }}</td>
                                         <td>{{ $k->nama }}</td>
                                         <td>{{ $k->slug }}</td>
                                         <td>{{ $k->tipe }}</td>
@@ -59,6 +61,15 @@
                 <form id="form-tambah-kategori">
                     @csrf
                     <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="parent_id" class="form-label">Parent Kategori</label>
+                            <select name="parent_id" id="parent_id" class="form-control">
+                                <option value="">--Pilih Parent Kategori--</option>
+                                @foreach ($parents as $item)
+                                    <option value="{{ $item->id }}">{{ $item->nama }}</option>
+                                @endforeach
+                            </select>
+                        </div>
                         <div class="mb-3">
                             <label for="nama_kategori" class="form-label">Nama Kategori</label>
                             <input type="text" class="form-control" id="nama_kategori" name="nama_kategori"
@@ -101,6 +112,15 @@
                     @method('PUT')
                     <input type="hidden" id="edit_id">
                     <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="edit_parent_id" class="form-label">Parent Kategori</label>
+                            <select name="parent_id" id="edit_parent_id" class="form-control">
+                                <option value="">--Pilih Parent Kategori--</option>
+                                @foreach ($parents as $item)
+                                    <option value="{{ $item->id }}">{{ $item->nama }}</option>
+                                @endforeach
+                            </select>
+                        </div>
                         <div class="mb-3">
                             <label for="edit_nama_kategori" class="form-label">Nama Kategori</label>
                             <input type="text" class="form-control" id="edit_nama_kategori" name="nama_kategori"
@@ -163,6 +183,7 @@
                 let url = "{{ route('admin.kategori.edit', ':id') }}".replace(':id', id);
                 $.get(url, function(data) {
                     $('#edit_id').val(data.id);
+                    $('#edit_parent_id').val(data.parent_id).trigger('change');
                     $('#edit_nama_kategori').val(data.nama);
                     $('#edit_deskripsi').val(data.deskripsi);
                     $('#edit_tipe').val(data.tipe);

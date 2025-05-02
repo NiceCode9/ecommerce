@@ -14,7 +14,8 @@ class KategoriController extends Controller
     public function index()
     {
         $kategori = Kategori::all();
-        return view('admin.kategori', compact('kategori'));
+        $parents = Kategori::whereNull('parent_id')->get();
+        return view('admin.kategori', compact('kategori', 'parents'));
     }
 
     /**
@@ -28,6 +29,8 @@ class KategoriController extends Controller
         ]);
 
         $kategori = Kategori::create([
+            'parent_id' => $request->parent_id,
+            'tipe' => $request->tipe,
             'nama' => $request->nama_kategori,
             'slug' => Str::slug($request->nama_kategori),
             'deskripsi' => $request->deskripsi
@@ -59,6 +62,7 @@ class KategoriController extends Controller
         ]);
 
         $kategori->update([
+            'parent_id' => $request->parent_id,
             'nama' => $request->nama_kategori,
             'slug' => Str::slug($request->nama_kategori),
             'tipe' => $request->tipe,
