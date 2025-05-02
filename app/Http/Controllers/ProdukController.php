@@ -31,8 +31,9 @@ class ProdukController extends Controller
         $kategori = Kategori::orderBy('nama', 'asc')->get();
         $sockets = Socket::orderBy('nama', 'asc')->get();
         $brands = Brand::orderBy('nama', 'asc')->get();
-        $mobos = Produk::with(['kategori' => fn($q) => $q->where('tipe', 'motherboard')])
-            ->get();
+        $mobos = Produk::whereHas('kategori', function ($q) {
+            $q->where('tipe', 'motherboard');
+        })->get();
 
         return view('admin.produk.create', compact('kategori', 'sockets', 'brands', 'mobos'));
     }
