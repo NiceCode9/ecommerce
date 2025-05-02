@@ -71,7 +71,7 @@
                             @enderror
                         </div>
                         <div class="form-group">
-                            <label for="berat">Berat (gram)</label>
+                            <label for="berat">Berat (Kg)</label>
                             <input type="number" name="berat" id="berat"
                                 class="form-control @error('berat') is-invalid @enderror" step="0.01"
                                 value="{{ old('berat', $produk->berat) }}">
@@ -380,10 +380,14 @@
                     $('#socket_id').prop('disabled', false);
                     $('#socket_id').closest('.form-group').show();
                     $('#mobo_id').closest('.form-group').hide();
-                } else {
+                } else if (kategoriTipe === 'memory') {
                     $('#socket_id').closest('.form-group').hide();
                     $('#mobo_id').prop('disabled', false);
                     $('#mobo_id').closest('.form-group').show();
+                } else {
+                    $('#socket_id').closest('.form-group').hide();
+                    // $('#mobo_id').prop('disabled', false);
+                    $('#mobo_id').closest('.form-group').hide();
                 }
             }
 

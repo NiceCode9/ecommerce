@@ -315,10 +315,14 @@
                     $('#socket_id').prop('disabled', false);
                     $('#socket_id').closest('.form-group').show();
                     $('#mobo_id').closest('.form-group').hide();
-                } else {
+                } else if (kategoriTipe === 'memory') {
                     $('#socket_id').closest('.form-group').hide();
                     $('#mobo_id').prop('disabled', false);
                     $('#mobo_id').closest('.form-group').show();
+                } else {
+                    $('#socket_id').closest('.form-group').hide();
+                    // $('#mobo_id').prop('disabled', false);
+                    $('#mobo_id').closest('.form-group').hide();
                 }
             }
 

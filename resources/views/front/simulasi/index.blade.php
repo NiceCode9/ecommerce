@@ -372,7 +372,7 @@
                         method: 'GET'
                     });
                     let ramOptions = '<option value="">Pilih RAM</option>';
-                    ramResponse.forEach(ram => {
+                    initialData.rams.forEach(ram => {
                         ramOptions +=
                             `<option value="${ram.id}" data-harga="${ram.harga_setelah_diskon}">${ram.nama}</option>`;
                     });
@@ -546,7 +546,7 @@
             async function loadRAM(motherboardId) {
                 try {
                     const response = await $.ajax({
-                        url: `/simulasi/api/components/ram?mode=${currentMode}&motherboard_id=${motherboardId}`,
+                        url: `/simulasi/api/components/memory?mode=${currentMode}&motherboard_id=${motherboardId}`,
                         method: 'GET'
                     });
                     let options = '<option value="">Pilih RAM</option>';

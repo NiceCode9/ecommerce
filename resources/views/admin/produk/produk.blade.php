@@ -158,6 +158,9 @@
 
             $(document).on('click', '.btn-delete', function() {
                 var id = $(this).data('id');
+                var url = "{{ route('admin.produk.destroy', ':produk') }}".replace(':produk', id);
+                console.log(url);
+
                 Swal.fire({
                     title: 'Apakah Anda Yakin?',
                     text: "Data ini akan dihapus!",
@@ -169,12 +172,13 @@
                 }).then((result) => {
                     if (result.isConfirmed) {
                         $.ajax({
-                            url: '/admin/produk/' + id,
-                            type: 'DELETE',
+                            url: url,
+                            method: 'DELETE',
                             data: {
                                 _token: '{{ csrf_token() }}'
                             },
                             success: function(response) {
+                                console.log(response);
                                 Swal.fire(
                                     'Deleted!',
                                     response.message,
@@ -184,6 +188,8 @@
                                 });
                             },
                             error: function(xhr) {
+                                console.log(xhr.responseJSON.message);
+
                                 Swal.fire(
                                     'Error!',
                                     xhr.responseJSON.message,

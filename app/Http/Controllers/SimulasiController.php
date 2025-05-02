@@ -23,8 +23,11 @@ class SimulasiController extends Controller
             ->get();
         $motherboards = Produk::with(['kategori' => fn($q) => $q->where('tipe', 'motherboard')])
             ->get();
-        $rams = Produk::with(['kategori' => fn($q) => $q->where('tipe', 'ram')])
-            ->get();
+        // $rams = Produk::with(['kategori' => fn($q) => $q->where('tipe', 'memory')])
+        //     ->get();
+        $rams = Produk::whereHas('kategori', function ($query) {
+            $query->where('tipe', 'memory');
+        })->get();
 
         $initialData = [
             'sockets' => $sockets,
@@ -57,7 +60,7 @@ class SimulasiController extends Controller
                 $query->where('socket_id', $request->socket_id);
             }
 
-            if ($type === 'ram' && $request->motherboard_id) {
+            if ($type === 'memory' && $request->motherboard_id) {
                 // $mobo = Produk::find($request->motherboard_id);
                 $query->where('mobo_id', $request->motherboard_id);
             }

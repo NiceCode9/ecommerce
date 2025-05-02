@@ -186,7 +186,9 @@ class ProdukController extends Controller
         $kategori = Kategori::orderBy('nama', 'asc')->get();
         $sockets = Socket::orderBy('nama', 'asc')->get();
         $brands = Brand::orderBy('nama', 'asc')->get();
-        $mobos = Produk::whereNotNull('mobo_id')->get();
+        $mobos = Produk::whereHas('kategori', function ($q) {
+            $q->where('tipe', 'motherboard');
+        })->get();
         $produk->load('spesifikasi', 'gambar');
         // $produk->spesifikasi = $produk->spesifikasi->map(function ($item) {
         //     return [
@@ -342,7 +344,7 @@ class ProdukController extends Controller
 
         $produk->delete();
 
-        return redirect()->route('admin.produk.index')->with('success', 'Produk berhasil dihapus.');
+        return response()->json(['success' => true]);
     }
 
     public function destroyGambar($id)

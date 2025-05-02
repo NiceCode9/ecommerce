@@ -16,6 +16,7 @@ Route::middleware(['auth', 'checkrole:admin'])->prefix('admin')->name('admin.')-
     Route::resource('brand', BrandController::class)->except(['show']);
     Route::resource('socket', SocketController::class)->except(['show']);
     Route::resource('produk', ProdukController::class);
+
     Route::delete('produk/gambar/{gambar}', [ProdukController::class, 'destroyGambar'])->name('produk.destroyGambar');
     Route::get('/produk/{id}/gambar', [ProdukController::class, 'getGambar'])->name('produk.getgambar');
     Route::post('/produk/gambar/set-utama/{id}', [ProdukController::class, 'setGambarUtama'])->name('produk.gambar.set-utama');
@@ -26,3 +27,6 @@ Route::middleware(['auth', 'checkrole:admin'])->prefix('admin')->name('admin.')-
     Route::get('/pesanan/{id}', [ManagePesananController::class, 'show'])->name('pesanan.show');
     Route::post('/pesanan/{id}/update-status', [ManagePesananController::class, 'updateStatus'])->name('pesanan.update-status');
 });
+
+
+// The DELETE method is not supported for route admin/produk. Supported methods: GET, HEAD, POST.
