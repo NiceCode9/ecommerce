@@ -6,6 +6,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProdukController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SettingController;
+use App\Http\Controllers\SimulasiController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -32,6 +33,14 @@ Route::get('/produk', [ProdukFrontController::class, 'index'])->name('produk.ind
 Route::get('/produk/{id}', [ProdukFrontController::class, 'show'])->name('produk.detail');
 Route::get('/produk/kategori/{id}', [ProdukFrontController::class, 'byCategory'])->name('produk.kategori');
 Route::get('/produk/brand/{id}', [ProdukFrontController::class, 'byBrand'])->name('produk.brand');
+
+Route::prefix('simulasi')->group(function () {
+    Route::get('/', [SimulasiController::class, 'index'])->name('simulasi.index');
+
+    Route::get('/api/components/{type}', [SimulasiController::class, 'getComponents'])->name('simulasi.getComponents');
+    Route::get('/api/sockets', [SimulasiController::class, 'getSockets'])->name('simulasi.getSockets');
+    Route::post('/save', [SimulasiController::class, 'saveBuild'])->name('simulasi.save');
+});
 
 Route::post('midtrans/callback', [App\Http\Controllers\MidtransController::class, 'handleNotification'])->name('midtrans.callback');
 
