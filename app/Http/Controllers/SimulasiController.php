@@ -10,10 +10,10 @@ use App\Models\Kategori;
 use App\Models\Socket;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 
 class SimulasiController extends Controller
 {
-
     public function index()
     {
         $brands = Brand::where('is_processor', true)->get();
@@ -70,22 +70,75 @@ class SimulasiController extends Controller
 
     public function saveBuild(Request $request)
     {
-        $user = auth()->user();
-        $initials = strtoupper(substr($user->name, 0, 2));
-        $kode = 'SML-' . $initials . '-' . strtoupper(uniqid());
-        $name = $kode;
-        $slug = Str::slug($name);
-
-        $build = Build::create([
-            'kode' => $kode,
-            'user_id' => $user->id,
-            'name' => $name,
-            'slug' => $slug,
-            'description' => $request->description,
-            'total_price' => 0,
-            'mode' => $request->mode,
-            'status' => 'draft',
-            'is_public' => false,
+        $request->validate([
+            'mode' => 'required|in:compatibility,free',
+            'components' => 'required|array',
+            'components.*.id' => 'required|exists:produk,id',
+            'components.*.quantity' => 'required|integer|min:1'
         ]);
+
+        DB::beginTransaction();
+
+        try {
+            $user = auth()->user();
+            $initials = strtoupper(substr($user->name, 0, 2));
+            $kode = 'SML-' . $initials . '-' . strtoupper(uniqid());
+            $name = $kode;
+            $slug = Str::slug($name);
+
+            // Calculate total price
+            $totalPrice = 0;
+            $componentsData = [];
+
+            foreach ($request->components as $componentType => $component) {
+                $product = Produk::findOrFail($component['id']);
+                $subtotal = $product->harga_setelah_diskon * $component['quantity'];
+
+                $componentsData[] = [
+                    'produk_id' => $component['id'],
+                    'component_type' => $componentType,
+                    'quantity' => $component['quantity'],
+                    'subtotal' => $subtotal
+                ];
+
+                $totalPrice += $subtotal;
+            }
+
+            // Create the build
+            $build = Build::create([
+                'kode' => $kode,
+                'user_id' => $user->id,
+                'name' => $name,
+                'slug' => $slug,
+                'description' => $request->description ?? 'Rakitan PC baru',
+                'total_price' => $totalPrice,
+                'mode' => $request->mode,
+                'status' => 'draft',
+                'is_public' => $request->is_public ?? false,
+            ]);
+
+            // Add components to the build
+            foreach ($componentsData as $component) {
+                $build->components()->create($component);
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Rakitan berhasil disimpan!',
+                'data' => [
+                    'build_id' => $build->id,
+                    'kode' => $build->kode,
+                    'total_price' => $totalPrice
+                ]
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal menyimpan rakitan: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }

@@ -226,7 +226,6 @@
 
                             @foreach ($kategori as $k)
                                 <h3 class="section-title">{{ Str::upper($k->nama) }}</h3>
-                                <hr>
                                 @foreach ($k->children()->where('tipe', 'general')->get() as $item)
                                     <div class="form-section row align-items-center">
                                         <div class="col-md-3">
@@ -259,7 +258,19 @@
                                     </div>
                                 @endforeach
                             @endforeach
+                            <hr>
 
+                            <div class="form-section row align-item-right">
+                                <div class="col-md-3"></div>
+                                <div class="col-md-4 text-right">
+                                    <label for="grandTotal">Grand Total</label>
+                                </div>
+                                <div class="col-md-5">
+                                    <div class="input-group float-right" style="width: 100%;">
+                                        <input type="text" class="input" name="grandTotal" readonly>
+                                    </div>
+                                </div>
+                            </div>
                             <button id="save-build" class="btn btn-primary mt-3" disabled>
                                 Simpan Rakitan
                             </button>
@@ -274,27 +285,37 @@
 @push('front-script')
     <script>
         $(document).ready(function() {
-            // Initialize with initial data
+            // Inisialisasi dengan data awal
             const initialData = @json($initialData);
             let currentMode = $('#mode-select').val();
             let selectedComponents = {};
 
-            // Initialize selects based on current mode
+            // Inisialisasi select berdasarkan mode saat ini
             initializeSelects();
 
-            // Initial state - compatibility mode
+            // Keadaan awal - mode kompatibilitas
             if (currentMode === 'compatibility') {
                 $('#socket-select, #processor-select, #motherboard-select, #ram-select').prop('disabled', true);
             }
 
-            // Price calculation functions
+            // Fungsi perhitungan harga
             function changePrice(componentType) {
                 const section = $(`.form-section:has([data-component="${componentType}"])`);
                 const select = section.find('.component-select');
                 const quantity = section.find('.quantity-input').val();
                 const price = select.find('option:selected').data('harga') || 0;
                 const subtotal = price * quantity;
+                let grandTotal = 0;
 
+                $('.subtotal-input').each(function() {
+                    const subtotalValue = parseFloat($(this).val().replace(/\./g, "").replace(/[^0-9.-]+/g,
+                        "")) / 100;
+                    if (!isNaN(subtotalValue)) {
+                        grandTotal += subtotalValue;
+                    }
+                });
+                console.log('Grandtotal:', grandTotal);
+                $('input[name=grandTotal]').val(grandTotal);
                 section.find('.subtotal-input').val(formatCurrency(subtotal));
             }
 
@@ -305,12 +326,12 @@
                 }).format(amount);
             }
 
-            // Initialize selects based on mode
+            // Inisialisasi select berdasarkan mode
             function initializeSelects() {
                 if (currentMode === 'free') {
                     loadAllComponents();
                 } else {
-                    // Initialize with empty options for compatibility mode
+                    // Inisialisasi dengan opsi kosong untuk mode kompatibilitas
                     $('#socket-select').html('<option value="">Pilih Socket</option>');
                     $('#processor-select').html('<option value="">Pilih Processor</option>');
                     $('#motherboard-select').html('<option value="">Pilih Motherboard</option>');
@@ -318,10 +339,10 @@
                 }
             }
 
-            // Load all components for free mode
+            // Memuat semua komponen untuk mode bebas
             async function loadAllComponents() {
                 try {
-                    // Load all processors
+                    // Memuat semua processor
                     const procResponse = await $.ajax({
                         url: `/simulasi/api/components/processor?mode=free`,
                         method: 'GET'
@@ -333,7 +354,7 @@
                     });
                     $('#processor-select').html(procOptions).prop('disabled', false);
 
-                    // Load all motherboards
+                    // Memuat semua motherboard
                     const moboResponse = await $.ajax({
                         url: `/simulasi/api/components/motherboard?mode=free`,
                         method: 'GET'
@@ -345,7 +366,7 @@
                     });
                     $('#motherboard-select').html(moboOptions).prop('disabled', false);
 
-                    // Load all RAM
+                    // Memuat semua RAM
                     const ramResponse = await $.ajax({
                         url: `/simulasi/api/components/ram?mode=free`,
                         method: 'GET'
@@ -357,7 +378,7 @@
                     });
                     $('#ram-select').html(ramOptions).prop('disabled', false);
 
-                    // Also enable socket select in free mode with all options
+                    // Juga mengaktifkan select socket di mode bebas dengan semua opsi
                     let socketOptions = '<option value="">Pilih Socket</option>';
                     initialData.sockets.forEach(socket => {
                         socketOptions += `<option value="${socket.id}">${socket.nama}</option>`;
@@ -365,21 +386,21 @@
                     $('#socket-select').html(socketOptions).prop('disabled', false);
 
                 } catch (error) {
-                    console.error('Error loading free components:', error);
+                    console.error('Error memuat komponen bebas:', error);
                 }
             }
 
-            // Mode selection handler
+            // Handler pemilihan mode
             $('#mode-select').change(function() {
                 currentMode = $(this).val();
                 if (currentMode === 'free') {
-                    // Enable all selects and show all options
+                    // Mengaktifkan semua select dan menampilkan semua opsi
                     $('#brand-select').prop('disabled', false).val('');
                     $('#socket-select, #processor-select, #motherboard-select, #ram-select').prop(
                         'disabled', false);
                     loadAllComponents();
                 } else {
-                    // Compatibility mode - reset and disable fields
+                    // Mode kompatibilitas - reset dan nonaktifkan field
                     $('#brand-select').prop('disabled', false).val('');
                     $('#socket-select').val('').prop('disabled', true);
                     $('#processor-select').val('').prop('disabled', true);
@@ -387,12 +408,12 @@
                     $('#ram-select').val('').prop('disabled', true);
                 }
 
-                // Reset all selections
+                // Reset semua pilihan
                 selectedComponents = {};
                 $('#save-build').prop('disabled', true);
             });
 
-            // Brand Select Change - only relevant in compatibility mode
+            // Perubahan Brand Select - hanya relevan di mode kompatibilitas
             $('#brand-select').change(function() {
                 if (currentMode === 'compatibility') {
                     const brandId = $(this).val();
@@ -405,7 +426,7 @@
                 }
             });
 
-            // Socket Select Change - only relevant in compatibility mode
+            // Perubahan Socket Select - hanya relevan di mode kompatibilitas
             $('#socket-select').change(function() {
                 if (currentMode === 'compatibility') {
                     const socketId = $(this).val();
@@ -417,7 +438,7 @@
                 }
             });
 
-            // Processor Select Change
+            // Pemilihan Processor
             $('#processor-select').change(function() {
                 const processorId = $(this).val();
                 selectedComponents.processor = processorId;
@@ -433,7 +454,7 @@
                 }
             });
 
-            // Motherboard Select Change
+            // Pemilihan Motherboard
             $('#motherboard-select').change(function() {
                 const moboId = $(this).val();
                 selectedComponents.motherboard = moboId;
@@ -448,14 +469,14 @@
                 }
             });
 
-            // RAM Select Change
+            // Pemilihan RAM
             $('#ram-select').change(function() {
                 selectedComponents.ram = $(this).val();
                 changePrice('ram');
                 $('#save-build').prop('disabled', false);
             });
 
-            // Component change handlers for dynamic categories
+            // Handler perubahan komponen untuk kategori dinamis
             $(document).on('change', '.component-select', function() {
                 const componentType = $(this).data('component');
                 changePrice(componentType);
@@ -466,7 +487,7 @@
                 changePrice(componentType);
             });
 
-            // AJAX functions for compatibility mode
+            // Fungsi ajax untuk mode kompatibilitas
             async function loadSockets(brandId) {
                 try {
                     const response = await $.ajax({
@@ -480,7 +501,7 @@
                     $('#socket-select').html(options).prop('disabled', false);
                     $('#processor-select, #motherboard-select, #ram-select').val('').prop('disabled', true);
                 } catch (error) {
-                    console.error('Error loading sockets:', error);
+                    console.error('Error memuat socket:', error);
                 }
             }
 
@@ -499,7 +520,7 @@
                     $('#processor-select').html(options).prop('disabled', false);
                     $('#motherboard-select, #ram-select').val('').prop('disabled', true);
                 } catch (error) {
-                    console.error('Error loading processors:', error);
+                    console.error('Error memuat processor:', error);
                 }
             }
 
@@ -518,7 +539,7 @@
                     $('#motherboard-select').html(options).prop('disabled', false);
                     $('#ram-select').val('').prop('disabled', true);
                 } catch (error) {
-                    console.error('Error loading motherboards:', error);
+                    console.error('Error memuat motherboard:', error);
                 }
             }
 
@@ -536,41 +557,43 @@
 
                     $('#ram-select').html(options).prop('disabled', false);
                 } catch (error) {
-                    console.error('Error loading RAM:', error);
+                    console.error('Error memuat RAM:', error);
                 }
             }
 
-            // Save build function
             async function saveBuild() {
                 try {
-                    // Collect all selected components and quantities
+
                     const buildData = {
                         mode: currentMode,
-                        components: {
-                            processor: {
-                                id: $('#processor-select').val(),
-                                quantity: $(`input[data-component="processor"]`).val()
-                            },
-                            motherboard: {
-                                id: $('#motherboard-select').val(),
-                                quantity: $(`input[data-component="motherboard"]`).val()
-                            },
-                            ram: {
-                                id: $('#ram-select').val(),
-                                quantity: $(`input[data-component="ram"]`).val()
-                            }
-                        }
+                        components: {},
+                        description: 'Rakitan PC saya',
+                        is_public: false
                     };
 
-                    // Add dynamic category components
+                    // Tambahkan komponen utama
+                    ['processor', 'motherboard', 'ram'].forEach(type => {
+                        const select = $(`#${type}-select`);
+                        const quantity = $(`input[data-component="${type}"]`).val();
+                        if (select.val()) {
+                            buildData.components[type] = {
+                                id: select.val(),
+                                quantity: quantity
+                            };
+                        }
+                    });
+
+
                     $('.component-select').each(function() {
                         const componentType = $(this).data('component');
-                        if (componentType !== 'processor' && componentType !== 'motherboard' &&
-                            componentType !== 'ram') {
-                            buildData.components[componentType] = {
-                                id: $(this).val(),
-                                quantity: $(`input[data-component="${componentType}"]`).val()
-                            };
+                        if (!['processor', 'motherboard', 'ram'].includes(componentType)) {
+                            const quantity = $(`input[data-component="${componentType}"]`).val();
+                            if ($(this).val()) {
+                                buildData.components[componentType] = {
+                                    id: $(this).val(),
+                                    quantity: quantity
+                                };
+                            }
                         }
                     });
 
@@ -583,15 +606,18 @@
                         }
                     });
 
-                    alert('Rakitan berhasil disimpan!');
-                    window.location.href = '/simulasi/list'; // Redirect to build list
+                    if (response.success) {
+                        alert(response.message);
+                        window.location.href = '/simulasi/list'; // Redirect ke daftar rakitan
+                    } else {
+                        throw new Error(response.message);
+                    }
                 } catch (error) {
-                    console.error('Error saving build:', error);
-                    alert('Gagal menyimpan rakitan: ' + error.responseJSON.message);
+                    console.error('Error menyimpan rakitan:', error);
+                    alert('Gagal menyimpan rakitan: ' + error.message);
                 }
             }
 
-            // Save build button click handler
             $('#save-build').click(function(e) {
                 e.preventDefault();
                 saveBuild();

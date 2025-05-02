@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Build extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'kode',
         'user_id',
@@ -20,13 +21,18 @@ class Build extends Model
         'is_public'
     ];
 
-    public function user(): BelongsTo
-    {
-        return $this->belongsTo(User::class);
-    }
+    protected $casts = [
+        'total_price' => 'decimal:2',
+        'is_public' => 'boolean'
+    ];
 
-    public function components(): HasMany
+    public function components()
     {
         return $this->hasMany(BuildComponent::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }
