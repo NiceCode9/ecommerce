@@ -462,6 +462,17 @@
                             href="{{ route('home') }}">Home</a></li>
                     <li class="{{ request()->routeIs('produk.*') ? 'active' : '' }}"><a
                             href="{{ route('produk.index') }}">Produk</a></li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="true">
+                            Simulasi
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="{{ route('simulasi.index') }}" class="">Rakit</a></li>
+                            <li>
+                                <a href="{{ route('pelanggan.simulasi.list') }}" class="">List Simulasi</a>
+                            </li>
+                        </ul>
+                    </li>
                 </ul>
                 <!-- /NAV -->
             </div>

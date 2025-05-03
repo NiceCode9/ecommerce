@@ -53,5 +53,8 @@ Route::middleware(['auth', 'checkrole:pelanggan'])
 
         // Route::prefix('simulasi')->group(function () {
         Route::post('/simulasi/save', [SimulasiController::class, 'saveBuild'])->name('simulasi.save');
+        Route::get('/simulasi/list', [SimulasiController::class, 'list'])->name('simulasi.list');
+        Route::get('/simulasi/{build}', [SimulasiController::class, 'show'])->name('simulasi.show');
+        Route::delete('/simulasi/{build}', [SimulasiController::class, 'destroy'])->name('simulasi.destroy');
         // });
     });

@@ -20,30 +20,54 @@ class CheckOutController extends Controller
 {
     public function index()
     {
-        $cartIds = request('cart_ids', []); // Dapatkan dari query string
+        $cartIds = request('cart_ids', []);
+        $mode = request('mode', 'normal');
 
         // Validasi cart_ids
         if (empty($cartIds)) {
-            return redirect()->route('pelanggan.cart.index')->with('error', 'Silakan pilih produk untuk checkout');
+            return redirect()->back()->with('error', 'Silakan pilih produk untuk checkout');
         }
 
         $user = auth()->user();
 
-        $cartItems = $user->carts()
-            ->whereIn('id', $cartIds)
-            ->with('produk')
-            ->get();
+        if ($mode == "normal") {
+            $cartItems = $user->carts()
+                ->whereIn('id', $cartIds)
+                ->with('produk')
+                ->get();
 
-        // Hitung subtotal dan total berat
-        $subtotal = $cartItems->sum(function ($item) {
-            return $item->jumlah * $item->produk->harga_setelah_diskon;
-        });
+            // Hitung subtotal dan total berat
+            $subtotal = $cartItems->sum(function ($item) {
+                return $item->jumlah * $item->produk->harga_setelah_diskon;
+            });
 
-        $totalWeight = $cartItems->sum(function ($item) {
-            return $item->jumlah * $item->produk->berat;
-        });
+            $totalWeight = $cartItems->sum(function ($item) {
+                return $item->jumlah * $item->produk->berat;
+            });
 
-        $totalItems = $cartItems->sum('jumlah');
+            $totalItems = $cartItems->sum('jumlah');
+        } else {
+            $builds = $user->builds()
+                ->with('components.produk')
+                ->find(request('build_id'));
+
+            $cartItems = $builds->components()
+                ->whereIn('id', $cartIds)
+                ->with('produk')
+                ->get();
+
+            // Hitung subtotal dan total berat
+            $subtotal = $cartItems->sum(function ($item) {
+                return $item->quantity * $item->produk->harga_setelah_diskon;
+            });
+
+            $totalWeight = $cartItems->sum(function ($item) {
+                return $item->quantity * $item->produk->berat;
+            });
+
+            $totalItems = $cartItems->sum('quantity');
+        }
+
 
         // Ambil daftar alamat user
         // $alamats = $user->alamat()->orderBy('is_utama', 'desc')->get();

@@ -144,4 +144,48 @@ class SimulasiController extends Controller
             ], 500);
         }
     }
+
+    public function list()
+    {
+        $builds = Build::with('components.produk')
+            ->where('user_id', auth()->id())
+            ->orderBy('created_at', 'DESC')
+            ->paginate(10);
+
+        return view('front.simulasi.list', compact('builds'));
+    }
+
+    public function show(Build $build)
+    {
+        // Authorization - hanya pemilik yang bisa melihat
+        if ($build->user_id !== auth()->id()) {
+            abort(403);
+        }
+
+        $build->load('components.produk.kategori');
+
+        return view('front.simulasi.show', compact('build'));
+    }
+
+    public function destroy(Build $build)
+    {
+        // Authorization - hanya pemilik yang bisa menghapus
+        if ($build->user_id !== auth()->id()) {
+            abort(403);
+        }
+
+        DB::beginTransaction();
+        try {
+            $build->components()->delete();
+            $build->delete();
+            DB::commit();
+
+            return redirect()->route('simulasi.list')
+                ->with('success', 'Rakitan berhasil dihapus');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()
+                ->with('error', 'Gagal menghapus rakitan: ' . $e->getMessage());
+        }
+    }
 }

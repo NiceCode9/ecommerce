@@ -32,8 +32,8 @@
 
         .product-widget .delete {
             /* position: absolute;
-                                                                                                                                                    right: 0;
-                                                                                                                                                    top: 50%; */
+                                                                                                                                                        right: 0;
+                                                                                                                                                        top: 50%; */
             /* transform: translateY(-50%); */
             background: none;
             border: none;

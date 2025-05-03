@@ -98,4 +98,10 @@ class User extends Authenticatable
     {
         return $this->hasMany(Ulasan::class, 'pengguna_id');
     }
+
+    // Relasi dengan build
+    public function builds()
+    {
+        return $this->hasMany(Build::class, 'user_id');
+    }
 }
