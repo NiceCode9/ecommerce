@@ -72,4 +72,39 @@ class Pesanan extends Model
     {
         return $this->hasMany(Ulasan::class, 'pesanan_id');
     }
+
+    public function getStatusLabelAttribute()
+    {
+        switch ($this->status) {
+            case 'menunggu_pembayaran':
+                return 'Menunggu Pembayaran';
+            case 'diproses':
+                return 'Diproses';
+            case 'dikirim':
+                return 'Dikirim';
+            case 'selesai':
+                return 'Selesai';
+            case 'dibatalkan':
+                return 'Dibatalkan';
+            default:
+                return 'Status Tidak Dikenal';
+        }
+    }
+    public function getStatusColorAttribute()
+    {
+        switch ($this->status) {
+            case 'menunggu_pembayaran':
+                return 'warning';
+            case 'diproses':
+                return 'info';
+            case 'dikirim':
+                return 'primary';
+            case 'selesai':
+                return 'success';
+            case 'dibatalkan':
+                return 'danger';
+            default:
+                return 'secondary';
+        }
+    }
 }

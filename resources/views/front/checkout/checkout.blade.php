@@ -163,9 +163,9 @@
                                 <div class="order-products">
                                     @foreach ($cartItems as $item)
                                         <div class="order-col">
-                                            <div>{{ $item->jumlah }}x {{ $item->produk->nama }}</div>
+                                            <div>{{ $item->jumlah ?? $item->quantity }}x {{ $item->produk->nama }}</div>
                                             <div>Rp
-                                                {{ number_format($item->produk->harga_setelah_diskon * $item->jumlah, 0, ',', '.') }}
+                                                {{ number_format($item->produk->harga_setelah_diskon * ($item->jumlah ?? $item->quantity), 0, ',', '.') }}
                                             </div>
                                         </div>
                                     @endforeach

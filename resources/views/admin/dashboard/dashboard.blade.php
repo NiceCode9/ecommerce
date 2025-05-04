@@ -8,8 +8,12 @@
 
 @section('content')
     <div class="row">
-        <div class="col-md-12">
+        @include('admin.dashboard.widgets')
+    </div>
 
-        </div>
+    <!-- Main content sections -->
+    <div class="row">
+        @include('admin.dashboard.charts')
+        @include('admin.dashboard.recent_orders')
     </div>
 @endsection
