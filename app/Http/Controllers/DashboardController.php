@@ -21,6 +21,7 @@ class DashboardController extends Controller
         $totalRevenue = Pesanan::where('status', 'selesai')->sum('total_bayar');
         $totalProducts = Produk::count();
         $pendingPayments = Pembayaran::where('status', 'pending')->count();
+        // dd($pendingPayments);
 
         // Pesanan terbaru
         $recentOrders = Pesanan::with('user')
@@ -34,7 +35,7 @@ class DashboardController extends Controller
         // Data untuk grafik kategori produk
         $categoryChart = $this->getCategoryChartData();
 
-        return view('admin.dashboard', compact(
+        return view('admin.dashboard.dashboard', compact(
             'totalOrders',
             'totalRevenue',
             'totalProducts',
@@ -58,8 +59,8 @@ class DashboardController extends Controller
             $dates[] = $date->format('d M');
 
             $total = Pembayaran::whereDate('created_at', $formattedDate)
-                ->where('status', 'selesai')
-                ->sum('total_bayar');
+                ->where('status', 'sukses')
+                ->sum('jumlah');
 
             $salesData[] = $total ?? 0;
         }

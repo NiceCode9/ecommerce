@@ -3,7 +3,7 @@
         <div class="card-header border-0">
             <h3 class="card-title">Pesanan Terbaru</h3>
             <div class="card-tools">
-                <a href="{{ route('admin.orders.index') }}" class="btn btn-tool btn-sm">
+                <a href="{{ route('admin.pesanan.index') }}" class="btn btn-tool btn-sm">
                     Lihat Semua <i class="fas fa-arrow-right"></i>
                 </a>
             </div>
@@ -33,7 +33,7 @@
                             <td>{{ format_currency($order->total_bayar) }}</td>
                             <td>{{ $order->created_at->format('d M Y H:i') }}</td>
                             <td>
-                                <a href="{{ route('admin.orders.show', $order->id) }}" class="btn btn-sm btn-info">
+                                <a href="{{ route('admin.pesanan.show', $order->id) }}" class="btn btn-sm btn-info">
                                     <i class="fas fa-eye"></i>
                                 </a>
                             </td>

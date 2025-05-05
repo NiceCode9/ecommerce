@@ -25,6 +25,8 @@
 </div>
 
 @push('scripts')
+    <!-- ChartJS -->
+    <script src="{{ asset('back') }}/plugins/chart.js/Chart.min.js"></script>
     <script>
         $(function() {
             // Sales Chart
