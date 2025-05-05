@@ -101,7 +101,7 @@ class CheckOutController extends Controller
                 ->get();
 
             if ($carts->isEmpty()) {
-                $builds = $user->builds()
+                $builds = auth()->user()->builds()
                     ->with('components.produk')
                     ->find(request('build_id'));
 
