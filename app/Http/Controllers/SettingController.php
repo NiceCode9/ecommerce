@@ -73,7 +73,7 @@ class SettingController extends Controller
     {
         $orderId = $request->query('order_id');
         $pesanan = Pesanan::where('nomor_pesanan', $orderId)
-            ->with(['pembayaran', 'items'])
+            ->with(['pembayaran', 'detailPesanan'])
             ->firstOrFail();
 
         // Update status jika belum terupdate via callback
@@ -95,7 +95,7 @@ class SettingController extends Controller
     {
         $orderId = $request->query('order_id');
         $pesanan = Pesanan::where('nomor_pesanan', $orderId)
-            ->with(['pembayaran', 'items'])
+            ->with(['pembayaran', 'detailPesanan'])
             ->firstOrFail();
 
         return view('front.payment.failed', compact('pesanan'));
