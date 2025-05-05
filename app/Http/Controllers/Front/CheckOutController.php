@@ -101,7 +101,14 @@ class CheckOutController extends Controller
                 ->get();
 
             if ($carts->isEmpty()) {
-                throw new \Exception("Keranjang belanja kosong");
+                $builds = $user->builds()
+                    ->with('components.produk')
+                    ->find(request('build_id'));
+
+                $carts = $builds->components()
+                    ->whereIn('id', $cartIds)
+                    ->with('produk')
+                    ->get();
             }
 
             $totalProduk = $carts->sum(fn($item) => $item->produk->harga_setelah_diskon * $item->jumlah);
