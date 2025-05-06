@@ -1,0 +1,18 @@
+RAJAONGKIR_API_KEY=kPrc3Fkfd113049d448f8fca2vkWgM5U
+
+MIDTRANS_MERCHANT_ID=G627960245
+MIDTRANS_CLIENT_KEY=SB-Mid-client-6RANIceXUKDhZnBf
+MIDTRANS_SERVER_KEY=SB-Mid-server-g6sjBnwhu3ehek6f6T-k6-5_
+MIDTRANS_IS_PRODUCTION=false
+MIDTRANS_FINISH_REDIRECT_URL=your-redirect-url
+MIDTRANS_UNFINISH_REDIRECT_URL=your-redirect-url
+MIDTRANS_ERROR_REDIRECT_URL=your-redirect-url
+
+Next Fitur :
+- Tombol selesai di show pesanan
+- Pencarian di simulasi by kode
+- Perbaikan Front End
+- Laporan Penjualan
+- Perbaikan Dashboard
+- Profile Customer
+- Fitur Registrasi, lupa password (Optional)

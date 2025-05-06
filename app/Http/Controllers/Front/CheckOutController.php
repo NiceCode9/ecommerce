@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Front;;
 use App\Http\Controllers\Controller;
 use App\Http\Services\RajaOngkirService;
 use App\Models\Alamat;
+use App\Models\BuildComponent;
 use App\Models\DetailPesanan;
 use App\Models\Keranjang;
 use App\Models\Pembayaran;
@@ -101,17 +102,12 @@ class CheckOutController extends Controller
                 ->get();
 
             if ($carts->isEmpty()) {
-                $builds = auth()->user()->builds()
-                    ->with('components.produk')
-                    ->find(request('build_id'));
-
-                $carts = $builds->components()
-                    ->whereIn('id', $cartIds)
+                $carts = BuildComponent::whereIn('id', $cartIds)
                     ->with('produk')
                     ->get();
             }
 
-            $totalProduk = $carts->sum(fn($item) => $item->produk->harga_setelah_diskon * $item->jumlah);
+            $totalProduk = $carts->sum(fn($item) => $item->produk->harga_setelah_diskon * ($item->jumlah ?? $item->quantity));
             $totalBayar = $totalProduk + $request->shipping_cost;
 
             $pesanan = Pesanan::create([
@@ -132,8 +128,8 @@ class CheckOutController extends Controller
                     'produk_id' => $cart->produk_id,
                     'nama_produk' => $cart->produk->nama,
                     'harga' => $cart->produk->harga_setelah_diskon,
-                    'jumlah' => $cart->jumlah,
-                    'subtotal' => $cart->produk->harga_setelah_diskon * $cart->jumlah
+                    'jumlah' => $cart->jumlah ?? $cart->quantity,
+                    'subtotal' => $cart->produk->harga_setelah_diskon * ($cart->jumlah ?? $item->quantity)
                 ]);
             }
 
