@@ -23,6 +23,7 @@ class Produk extends Model
         'socket_id',
         'mobo_id',
         'garansi_bulan',
+        'rating',
         'is_aktif',
         'dilihat',
     ];
@@ -31,6 +32,7 @@ class Produk extends Model
         'harga' => 'decimal:2',
         'diskon' => 'decimal:2',
         'berat' => 'decimal:2',
+        'rating' => 'decimal:1',
         'is_aktif' => 'boolean',
     ];
 
@@ -99,6 +101,14 @@ class Produk extends Model
     public function ulasan()
     {
         return $this->hasMany(Ulasan::class, 'produk_id');
+    }
+
+    public function hasBeenReviewed($userId, $pesananId)
+    {
+        return $this->ulasan()
+            ->where('pengguna_id', $userId)
+            ->where('pesanan_id', $pesananId)
+            ->exists();
     }
 
     // Menghitung harga setelah diskon

@@ -25,7 +25,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/calculate-cost', [SettingController::class, 'calculateShipping'])->name('api.calculate-shipping');
 
 
-    Route::post('/produk/{produkId}/ulasan', [UlasanController::class, 'store'])->name('produk.ulasan.store');
+    Route::post('/produk/{produk}/ulasan', [UlasanController::class, 'store'])
+        ->name('produk.ulasan.store');
     Route::post('/produk/ulasan/{ulasanId}/reply', [UlasanController::class, 'reply'])->name('produk.ulasan.reply');
 });
 

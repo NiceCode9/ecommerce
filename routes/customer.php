@@ -48,6 +48,10 @@ Route::middleware(['auth', 'checkrole:pelanggan'])
         Route::get('/pesanan/{id}', [PesananController::class, 'show'])->name('pesanan.show');
         Route::post('/pesanan/{id}/confirm-cod', [PesananController::class, 'confirmCodPayment'])
             ->name('pesanan.confirm-cod');
+        Route::put('/pesanan-action-confirm/{id}', [PesananController::class, 'actionConfirm'])->name('pesanan.action-confirm');
+        Route::get('/pesanan/{id}/review', [PesananController::class, 'reviewPage'])
+            ->name('pesanan.review');
+
         Route::get('/payment/success', [SettingController::class, 'success'])->name('payment.success');
         Route::get('/payment/failed', [SettingController::class, 'failed'])->name('payment.failed');
 

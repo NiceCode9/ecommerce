@@ -1,6 +1,13 @@
 @extends('front.layouts.main')
 
 @section('title', $product->nama . ' - ' . config('app.name'))
+@push('style')
+    <style>
+        .fa-star-half-o {
+            color: #ef233c !important;
+        }
+    </style>
+@endpush
 
 @section('content')
     <!-- BREADCRUMB -->
@@ -293,15 +300,15 @@
                                     <div class="col-md-6">
                                         <div id="reviews">
                                             <ul class="reviews">
-                                                @foreach ($product->ulasan as $ulasan)
+                                                @foreach ($ulasan as $u)
                                                     <li>
                                                         <div class="review-heading">
-                                                            <h5 class="name">{{ $ulasan->pengguna->name }}</h5>
+                                                            <h5 class="name">{{ $u->pengguna->name }}</h5>
                                                             <p class="date">
-                                                                {{ $ulasan->created_at->format('d M Y, H:i') }}</p>
+                                                                {{ $u->created_at->format('d M Y, H:i') }}</p>
                                                             <div class="review-rating">
                                                                 @for ($i = 1; $i <= 5; $i++)
-                                                                    @if ($i <= $ulasan->rating)
+                                                                    @if ($i <= $u->rating)
                                                                         <i class="fa fa-star"></i>
                                                                     @else
                                                                         <i class="fa fa-star-o empty"></i>
@@ -310,26 +317,28 @@
                                                             </div>
                                                         </div>
                                                         <div class="review-body">
-                                                            <p>{{ $ulasan->komentar }}</p>
-                                                            @if ($ulasan->gambar)
+                                                            <p>{{ $u->komentar }}</p>
+                                                            @if ($u->gambar)
                                                                 <div class="review-images">
-                                                                    <img src="{{ asset('storage/ulasan/' . $ulasan->gambar) }}"
+                                                                    <img src="{{ asset('storage/ulasan/' . $u->gambar) }}"
                                                                         alt="Review Image"
                                                                         style="max-width: 150px; max-height: 150px;">
                                                                 </div>
                                                             @endif
-                                                            @if ($ulasan->balasan_admin)
+                                                            @if ($u->balasan_admin)
                                                                 <div class="admin-reply">
-                                                                    <strong>Admin:</strong> {{ $ulasan->balasan_admin }}
+                                                                    <strong>Admin:</strong> {{ $u->balasan_admin }}
                                                                 </div>
                                                             @endif
                                                         </div>
                                                     </li>
                                                 @endforeach
                                             </ul>
-                                            <div class="reviews-pagination">
-                                                {{ $ulasan->appends(request()->query())->links('front.pagination') }}
-                                            </div>
+                                            @if (method_exists($ulasan, 'links'))
+                                                <div class="reviews-pagination">
+                                                    {{ $ulasan->appends(request()->except('page'))->links('front.pagination') }}
+                                                </div>
+                                            @endif
                                         </div>
                                     </div>
                                     <!-- /Reviews -->
@@ -342,7 +351,8 @@
                                                     action="{{ route('produk.ulasan.store', $product->id) }}" method="POST"
                                                     enctype="multipart/form-data">
                                                     @csrf
-                                                    <input type="hidden" name="pesanan_id" value="{{ $pesananId ?? '' }}">
+                                                    <input type="hidden" name="pesanan_id"
+                                                        value="{{ request('pesanan_id') ?? '' }}">
                                                     <input class="input" type="text" placeholder="Your Name"
                                                         value="{{ auth()->user()->name }}" readonly>
                                                     <input class="input" type="email" placeholder="Your Email"

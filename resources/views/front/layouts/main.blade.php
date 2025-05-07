@@ -673,6 +673,7 @@
                         </div>
                         <div class="form-group">
                             <label>Kode Pos</label>
+                            <input type="number" class="form-control" name="kode_pos">
                         </div>
                         <div class="form-group">
                             <label>Catatan (Opsional)</label>

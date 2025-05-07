@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('riwayat_status_pesanan', function (Blueprint $table) {
             $table->id();
             $table->foreignId('pesanan_id')->constrained('pesanan')->onDelete('cascade');
-            $table->enum('status', ['menunggu_pembayaran', 'diproses', 'dikirim', 'selesai', 'dibatalkan']);
+            $table->enum('status', ['menunggu_pembayaran', 'menunggu_verifikasi', 'diproses', 'dikirim', 'selesai', 'dibatalkan']);
             $table->text('catatan')->nullable();
             $table->timestamp('created_at')->useCurrent();
         });

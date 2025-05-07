@@ -31,10 +31,10 @@ class AlamatController extends Controller
             'label' => 'nullable|string'
         ]);
 
-        // if ($request->is_utama) {
-        //     Alamat::where('pengguna_id', auth()->id())
-        //         ->update(['is_utama' => false]);
-        // }
+        if ($request->is_utama) {
+            Alamat::where('pengguna_id', auth()->id())
+                ->update(['is_utama' => false]);
+        }
 
         Alamat::create([
             'pengguna_id' => auth()->id(),

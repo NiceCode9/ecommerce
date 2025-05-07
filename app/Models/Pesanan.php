@@ -18,6 +18,7 @@ class Pesanan extends Model
         'total_bayar',
         'alamat_pengiriman_id',
         // 'metode_pengiriman_id',
+        'alasan_pembatalan',
         'metode_pengiriman',
         'nomor_resi',
         'catatan',

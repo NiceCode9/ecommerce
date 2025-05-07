@@ -401,7 +401,7 @@ $(document).ready(function () {
         $('input[name="kelurahan"]').val(address
             .district_name); // Catatan: district_name biasanya nama kecamatan
         $('input[name="kode_pos"]').val(address.zip_code);
-        $('textarea[name="alamat_lengkap"]').val(address.label);
+        // $('textarea[name="alamat_lengkap"]').val(address.label);
         $('input[name="label"]').val(address.label);
         $('input[name="api_id"]').val(address.id); // Simpan ID dari API
 
