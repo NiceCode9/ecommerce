@@ -24,6 +24,11 @@
                 <a href="{{ route('login') }}" class="h1"><b>PESONACOM</b></a>
             </div>
             <div class="card-body">
+                @if (session('status'))
+                    <div class="alert alert-success">
+                        {{ session('status') }}
+                    </div>
+                @endif
                 <p class="login-box-msg">You forgot your password? Here you can easily retrieve a new password.</p>
                 <form action="{{ route('password.email') }}" method="post">
                     @csrf

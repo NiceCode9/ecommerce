@@ -25,6 +25,11 @@
                 <a href="{{ route('home') }}" class="h1"><b>PESONACOM</b></a>
             </div>
             <div class="card-body">
+                @if (session('status'))
+                    <div class="alert alert-success">
+                        {{ session('status') }}
+                    </div>
+                @endif
                 <p class="login-box-msg">Sign in to start your session</p>
 
                 <form action="{{ url('login') }}" method="post">
