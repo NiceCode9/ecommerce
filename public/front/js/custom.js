@@ -182,12 +182,61 @@ function updateQuantity(cartId, change) {
 }
 
 // Fungsi untuk cek auth
-function checkAuth() {
-    if ($('meta[name="authenticated"]').attr('content') === 'false') {
-        window.location.href = '/login?redirect=' + encodeURIComponent(window.location.pathname);
-        return false;
+// function checkAuth() {
+//     if ($('meta[name="authenticated"]').attr('content') === 'false') {
+//         window.location.href = '/login?redirect=' + encodeURIComponent(window.location.pathname);
+//         return false;
+//     }
+//     return true;
+// }
+function searchAddress() {
+    const keyword = $('#addressSearchInput').val().trim();
+    if (keyword.length < 3) {
+        showToast('Masukkan minimal 3 karakter', 'error');
+        return;
     }
-    return true;
+
+    $('#searchLoading').show();
+    $('#addressResults').empty();
+    $('#noResults').hide();
+
+    ajaxRequest({
+        url: '/get-wilayah',
+        type: 'GET',
+        data: { keyword: keyword },
+        success: function (response) {
+            $('#searchLoading').hide();
+
+            if (response.data && response.data.length > 0) {
+                const $tbody = $('#addressResults');
+                response.data.forEach(address => {
+                    $tbody.append(`
+                        <tr>
+                            <td>
+                                <strong>${address.label || address.district_name}</strong><br>
+                                <small class="text-muted">
+                                    ${address.subdistrict_name}, ${address.city_name}, ${address.province_name}
+                                </small>
+                            </td>
+                            <td>${address.zip_code || '-'}</td>
+                            <td>
+                                <button class="btn btn-sm btn-primary select-address"
+                                    data-address='${JSON.stringify(address)}'>
+                                    Pilih
+                                </button>
+                            </td>
+                        </tr>
+                    `);
+                });
+            } else {
+                $('#noResults').show();
+            }
+        },
+        error: function (xhr) {
+            $('#searchLoading').hide();
+            showToast('Terjadi kesalahan saat mencari alamat', 'error');
+        }
+    });
 }
 
 // Fungsi untuk tampilkan toast notifikasi
@@ -264,14 +313,14 @@ function changeMainImage(src) {
     $('.main-image').attr('src', src);
 }
 
-// function cari alamat
-function getAlamatPengguna() {
-    const $alamatSelect = $('select[name=alamat_id]');
+// function cari alamat untuk halaman checkout
+function getAlamatCheckout() {
+    const $alamatSelect = $('#alamatSelect');
     $alamatSelect.html('<option value="">--pilih alamat--</option>');
 
     $.ajax({
         type: "GET",
-        url: "/alamat/get-alamat-pelanggan", // Pastikan URL sesuai dengan route Anda
+        url: "/alamat/get-alamat-pelanggan", // Endpoint khusus checkout
         dataType: "json",
         success: function (response) {
             let options = '<option value="">--pilih alamat--</option>';
@@ -288,13 +337,16 @@ function getAlamatPengguna() {
                 `;
             });
             $alamatSelect.html(options);
-        },
-        error: function (xhr) {
-            console.error('Error fetching addresses:', xhr.responseJSON.message);
-            showToast('Gagal memuat alamat pengguna', 'error');
+
+            // Trigger change jika ada alamat utama
+            const utama = $alamatSelect.find('option[data-label*="(Alamat Utama)"]');
+            if (utama.length > 0) {
+                utama.prop('selected', true).trigger('change');
+            }
         }
     });
 }
+
 function searchAddress() {
     const keyword = $('#addressSearchInput').val().trim();
     if (keyword.length < 3) {
@@ -307,7 +359,7 @@ function searchAddress() {
     $('#noResults').hide();
 
     $.ajax({
-        url: '/get-wilayah', // Sesuaikan dengan route Anda
+        url: '/get-wilayah',
         type: 'GET',
         data: {
             keyword: keyword
@@ -351,11 +403,171 @@ function searchAddress() {
     });
 }
 
+// Fungsi untuk memuat daftar alamat di halaman profile
+function loadAlamatList() {
+    ajaxRequest({
+        url: '/alamat/get-alamat-pelanggan',
+        method: 'GET',
+        success: function (response) {
+            renderAlamatList(response);
+        },
+        error: function (xhr) {
+            showToast('Gagal memuat daftar alamat', 'error');
+        }
+    });
+}
+
+// Fungsi untuk render daftar alamat
+function renderAlamatList(alamats) {
+    const $alamatContainer = $('#alamat-list-container');
+    $alamatContainer.empty();
+
+    if (alamats.length === 0) {
+        $alamatContainer.html(`
+            <div class="text-center py-4">
+                <i class="fa fa-map-marker-alt fa-3x text-muted mb-3"></i>
+                <p class="text-muted">Anda belum memiliki alamat. Tambahkan alamat sekarang.</p>
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addAddressModal">
+                    <i class="fa fa-plus mr-1"></i> Tambah Alamat
+                </button>
+            </div>
+        `);
+        return;
+    }
+
+    let html = '<div class="row">';
+
+    alamats.forEach(alamat => {
+        html += `
+            <div class="col-md-6 mb-4">
+                <div class="card h-100 border-0 shadow-sm ${alamat.is_utama ? 'border-primary' : ''}">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            ${alamat.is_utama ?
+                '<span class="badge badge-primary">Utama</span>' :
+                '<span class="badge badge-secondary">Tambahan</span>'}
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button"
+                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <i class="fa fa-ellipsis-v"></i>
+                                </button>
+                                <div class="dropdown-menu dropdown-menu-right">
+                                    <button class="dropdown-item" data-toggle="modal"
+                                        data-target="#editAddressModal"
+                                        onclick="prepareEditAddress(${alamat.id})">
+                                        <i class="fa fa-edit mr-2"></i> Edit
+                                    </button>
+                                    <button class="dropdown-item" onclick="deleteAddress(${alamat.id})">
+                                        <i class="fa fa-trash mr-2"></i> Hapus
+                                    </button>
+                                    ${!alamat.is_utama ? `
+                                    <button class="dropdown-item" onclick="setMainAddress(${alamat.id})">
+                                        <i class="fa fa-star mr-2"></i> Jadikan Utama
+                                    </button>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        </div>
+                        <h5 class="card-title">${alamat.nama_penerima}</h5>
+                        <p class="card-text text-muted mb-1">
+                            <i class="fa fa-phone-alt mr-2"></i>${alamat.nomor_telepon}
+                        </p>
+                        <p class="card-text mb-1">${alamat.alamat_lengkap}</p>
+                        <p class="card-text text-muted small mb-1">
+                            ${alamat.kelurahan}, ${alamat.kecamatan}, ${alamat.kota}, ${alamat.provinsi}
+                        </p>
+                        <p class="card-text text-muted small">
+                            <i class="fa fa-map-pin mr-1"></i> Kode Pos: ${alamat.kode_pos}
+                        </p>
+                        ${alamat.catatan ? `
+                        <div class="alert alert-light small mt-3 mb-0">
+                            <i class="fa fa-sticky-note mr-2"></i> ${alamat.catatan}
+                        </div>
+                        ` : ''}
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+
+    html += '</div>';
+    $alamatContainer.html(html);
+}
+
+// Fungsi untuk menyiapkan edit alamat
+function prepareEditAddress(id) {
+    ajaxRequest({
+        url: `/alamat/${id}`,
+        method: 'GET',
+        success: function (response) {
+            $('#editAddressModal input[name="id"]').val(response.id);
+            $('#editAddressModal input[name="nama_penerima"]').val(response.nama_penerima);
+            $('#editAddressModal input[name="nomor_telepon"]').val(response.nomor_telepon);
+            $('#editAddressModal textarea[name="alamat_lengkap"]').val(response.alamat_lengkap);
+            $('#editAddressModal input[name="provinsi"]').val(response.provinsi);
+            $('#editAddressModal input[name="kota"]').val(response.kota);
+            $('#editAddressModal input[name="kecamatan"]').val(response.kecamatan);
+            $('#editAddressModal input[name="kelurahan"]').val(response.kelurahan);
+            $('#editAddressModal input[name="kode_pos"]').val(response.kode_pos);
+            $('#editAddressModal textarea[name="catatan"]').val(response.catatan);
+            $('#editAddressModal input[name="is_utama"]').prop('checked', response.is_utama);
+            $('#editAddressModal input[name="api_id"]').val(response.api_id);
+
+            // Set value untuk pencarian alamat
+            $('#editAddressModal input[name="cari-alamat"]').val(
+                `${response.kelurahan}, ${response.kecamatan}, ${response.kota}, ${response.provinsi}`
+            );
+        }
+    });
+}
+
+// Fungsi untuk menghapus alamat
+function deleteAddress(id) {
+    if (!confirm('Apakah Anda yakin ingin menghapus alamat ini?')) return;
+
+    ajaxRequest({
+        url: `/alamat/${id}`,
+        method: 'DELETE',
+        data: { _token: $('meta[name="csrf-token"]').attr('content') },
+        success: function (response) {
+            showToast(response.message);
+            loadAlamatList();
+
+            // Tutup semua modal yang terbuka
+            $('.modal').modal('hide');
+            $('.modal-backdrop').remove();
+        },
+        error: function (xhr) {
+            showToast('Error: ' + xhr.responseJSON.message, 'error');
+        }
+    });
+}
+
+// Fungsi untuk set alamat utama
+function setMainAddress(id) {
+    ajaxRequest({
+        url: `/alamat/${id}/set-utama`,
+        method: 'POST',
+        data: {
+            _token: $('meta[name="csrf-token"]').attr('content')
+        },
+        success: function (response) {
+            showToast(response.message);
+            loadAlamatList();
+        },
+        error: function (xhr) {
+            console.log(xhr.responseJSON.message);
+
+            showToast('Error: ' + xhr.responseJSON.message, 'error');
+        }
+    });
+}
+
 // Update counter wishlist dan cart saat load halaman
 $(document).ready(function () {
-    if ($('meta[name="authenticated"]').attr('content') === 'true') {
-        // Anda bisa tambahkan AJAX untuk get jumlah wishlist dan cart jika diperlukan
-    }
+    // if ($('meta[name="authenticated"]').attr('content') === 'true') {
+    //     // Anda bisa tambahkan AJAX untuk get jumlah wishlist dan cart jika diperlukan
+    // }
 
     // Event listener untuk tombol quick view
     $(document).on('click', '.quick-view', function (e) {
@@ -373,43 +585,75 @@ $(document).ready(function () {
     });
 
     $('#addressSearchTrigger').click(function () {
-        $('#addAddressModal').modal('hide'); // Sembunyikan sementara modal parent
+        // $('#addAddressModal').modal('hide'); // Sembunyikan sementara modal parent
         $('#searchAddressModal').modal('show');
     });
 
     // Saat modal pencarian ditutup
-    $('#searchAddressModal').on('hidden.bs.modal', function () {
-        $('#addAddressModal').modal('show'); // Tampilkan kembali modal parent
-    });
+    // $('#searchAddressModal').on('hidden.bs.modal', function () {
+    //     $('#addAddressModal').modal('show'); // Tampilkan kembali modal parent
+    // });
     $('#searchAddressBtn').click(searchAddress);
     $('#addressSearchInput').keypress(function (e) {
         if (e.which == 13) { // Enter key
             searchAddress();
         }
     });
+
+    // Pilih alamat dari hasil pencarian
+    // $(document).on('click', '.select-address', function () {
+    //     $('#searchAddressModal').modal('hide');
+    //     const address = $(this).data('address');
+
+    //     // Isi field-field di form utama
+    //     $('input[name="nama_penerima"]').val(''); // Reset dulu
+    //     $('input[name="nomor_telepon"]').val(''); // Reset dulu
+    //     $('input[name="provinsi"]').val(address.province_name);
+    //     $('input[name="kota"]').val(address.city_name);
+    //     $('input[name="kecamatan"]').val(address.subdistrict_name);
+    //     $('input[name="kelurahan"]').val(address
+    //         .district_name); // Catatan: district_name biasanya nama kecamatan
+    //     $('input[name="kode_pos"]').val(address.zip_code);
+    //     // $('textarea[name="alamat_lengkap"]').val(address.label);
+    //     $('input[name="label"]').val(address.label);
+    //     $('input[name="api_id"]').val(address.id); // Simpan ID dari API
+
+    //     // Update tampilan
+    //     $('input[name="cari-alamat"]').val(address.label);
+
+    //     // Tutup modal pencarian
+    //     $('#searchAddressModal').modal('hide');
+    // });
+
     // Pilih alamat dari hasil pencarian
     $(document).on('click', '.select-address', function () {
-        $('#searchAddressModal').modal('hide');
         const address = $(this).data('address');
+        const $activeForm = $('#searchAddressModal').data('active-form');
 
-        // Isi field-field di form utama
-        $('input[name="nama_penerima"]').val(''); // Reset dulu
-        $('input[name="nomor_telepon"]').val(''); // Reset dulu
-        $('input[name="provinsi"]').val(address.province_name);
-        $('input[name="kota"]').val(address.city_name);
-        $('input[name="kecamatan"]').val(address.subdistrict_name);
-        $('input[name="kelurahan"]').val(address
-            .district_name); // Catatan: district_name biasanya nama kecamatan
-        $('input[name="kode_pos"]').val(address.zip_code);
-        // $('textarea[name="alamat_lengkap"]').val(address.label);
-        $('input[name="label"]').val(address.label);
-        $('input[name="api_id"]').val(address.id); // Simpan ID dari API
+        // Isi field-field di form yang aktif (tambah/edit)
+        $($activeForm + ' input[name="provinsi"]').val(address.province_name);
+        $($activeForm + ' input[name="kota"]').val(address.city_name);
+        $($activeForm + ' input[name="kecamatan"]').val(address.subdistrict_name);
+        $($activeForm + ' input[name="kelurahan"]').val(address.district_name);
+        $($activeForm + ' input[name="kode_pos"]').val(address.zip_code);
+        $($activeForm + ' input[name="api_id"]').val(address.id);
 
-        // Update tampilan
-        $('input[name="cari-alamat"]').val(address.label);
 
-        // Tutup modal pencarian
+        // Update tampilan field pencarian
+        $($activeForm + ' input[name="cari-alamat"]').val(
+            `${address.district_name}, ${address.subdistrict_name}, ${address.city_name}, ${address.province_name}`
+        );
+
         $('#searchAddressModal').modal('hide');
+    });
+
+    // Set active form saat modal dibuka
+    $('#addAddressModal').on('show.bs.modal', function () {
+        $('#searchAddressModal').data('active-form', '#addressForm');
+    });
+
+    $('#editAddressModal').on('show.bs.modal', function () {
+        $('#searchAddressModal').data('active-form', '#editAddressForm ');
     });
 
     // Submit form alamat via AJAX
@@ -425,7 +669,12 @@ $(document).ready(function () {
                     $('#addAddressModal').modal('hide');
                     showToast('Alamat berhasil ditambahkan');
 
-                    getAlamatPengguna();
+                    // Panggil fungsi refresh yang sesuai berdasarkan halaman
+                    if (window.location.pathname.includes('checkout')) {
+                        getAlamatCheckout();
+                    } else {
+                        loadAlamatList();
+                    }
                 }
             },
             error: function (xhr) {

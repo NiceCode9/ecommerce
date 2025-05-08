@@ -41,7 +41,11 @@ Route::middleware(['auth', 'checkrole:pelanggan'])
         Route::prefix('alamat')->group(function () {
             Route::get('cities/{provinceId}', [AlamatController::class, 'getCities'])->name('alamat.cities');
             Route::get('/get-alamat-pelanggan', [AlamatController::class, 'getAlamat'])->name('alamat.get-alamat-pelanggan');
+            Route::get('/{id}', [AlamatController::class, 'edit'])->name('alamat.edit');
             Route::post('store', [AlamatController::class, 'store'])->name('alamat.store');
+            Route::put('/{id}', [AlamatController::class, 'update'])->name('alamat.update');
+            Route::delete('/{id}', [AlamatController::class, 'destroy'])->name('alamat.destroy');
+            Route::post('/{id}/set-utama', [AlamatController::class, 'setUtama'])->name('alamat.set-utama');
         });
 
         Route::get('/pesanan', [PesananController::class, 'index'])->name('pesanan.index');

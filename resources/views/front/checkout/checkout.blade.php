@@ -237,7 +237,7 @@
 @push('front-script')
     <script>
         $(document).ready(function() {
-            getAlamatPengguna();
+            getAlamatCheckout();
             // Tampilkan detail alama
             // t saat dipilih
             $('#alamatSelect').change(function() {

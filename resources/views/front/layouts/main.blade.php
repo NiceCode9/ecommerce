@@ -305,6 +305,53 @@
             min-width: 200px;
             padding: 10px 20px;
         }
+
+        /* Modal Pencarian Alamat */
+        #searchAddressModal .modal-dialog {
+            max-width: 800px;
+        }
+
+        #searchAddressModal .modal-content {
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        #searchAddressModal .modal-header {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #eee;
+            padding: 15px 20px;
+        }
+
+        #searchAddressModal .modal-title {
+            font-weight: 600;
+            color: #333;
+        }
+
+        #searchAddressModal .modal-body {
+            padding: 20px;
+        }
+
+        #searchAddressModal .table {
+            margin-bottom: 0;
+        }
+
+        #searchAddressModal .table th {
+            border-top: none;
+            font-weight: 500;
+        }
+
+        #searchAddressModal .select-address {
+            white-space: nowrap;
+        }
+
+        .modal-backdrop {
+            z-index: 1040;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-backdrop.show {
+            opacity: 0.5;
+        }
     </style>
 
     @stack('style')
@@ -700,6 +747,56 @@
 
     <!-- Modal Pencarian Alamat -->
     <div class="modal fade" id="searchAddressModal" tabindex="-1" role="dialog"
+        aria-labelledby="searchAddressModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="searchAddressModalLabel">Cari Alamat</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="addressSearchInput"
+                                placeholder="Masukkan kata kunci alamat...">
+                            <span class="input-group-btn">
+                                <button class="btn btn-primary" id="searchAddressBtn">
+                                    <i class="fa fa-search"></i> Cari
+                                </button>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="search-results">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Alamat Lengkap</th>
+                                    <th>Kode Pos</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="addressResults">
+                                <!-- Hasil pencarian akan muncul di sini -->
+                            </tbody>
+                        </table>
+                        <div id="noResults" style="display: none;">
+                            <p class="text-center text-muted">Tidak ada hasil ditemukan</p>
+                        </div>
+                        <div id="searchLoading" style="display: none;">
+                            <p class="text-center"><i class="fa fa-spinner fa-spin"></i> Mencari alamat...</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- <div class="modal fade" id="searchAddressModal" tabindex="-1" role="dialog"
         aria-labelledby="searchAddressModalLabel">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
@@ -747,7 +844,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> --}}
 
     <div id="ajax-loader" style="display:none;">
         <div class="spinner-overlay">
