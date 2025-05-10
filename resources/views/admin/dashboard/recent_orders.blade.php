@@ -24,13 +24,13 @@
                     @foreach ($recentOrders as $order)
                         <tr>
                             <td>{{ $order->nomor_pesanan }}</td>
-                            <td>{{ $order->user->name }}</td>
+                            <td>{{ $order->user ? $order->user->name : '' }}</td>
                             <td>
                                 <span class="badge badge-{{ $order->status_color }}">
                                     {{ $order->status_label }}
                                 </span>
                             </td>
-                            <td>{{ format_currency($order->total_bayar) }}</td>
+                            <td>{{ number_format($order->total_bayar, 0, ',', '.') }}</td>
                             <td>{{ $order->created_at->format('d M Y H:i') }}</td>
                             <td>
                                 <a href="{{ route('admin.pesanan.show', $order->id) }}" class="btn btn-sm btn-info">

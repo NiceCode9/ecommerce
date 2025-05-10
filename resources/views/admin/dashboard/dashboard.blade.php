@@ -16,4 +16,7 @@
         @include('admin.dashboard.charts')
         @include('admin.dashboard.recent_orders')
     </div>
+
+    <!-- Product performance sections -->
+    @include('admin.dashboard.product_widgets')
 @endsection

@@ -11,6 +11,7 @@ use App\Models\Pembayaran;
 use App\Models\Pesanan;
 use App\Models\Produk;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
@@ -21,10 +22,9 @@ class DashboardController extends Controller
         $totalRevenue = Pesanan::where('status', 'selesai')->sum('total_bayar');
         $totalProducts = Produk::count();
         $pendingPayments = Pembayaran::where('status', 'pending')->count();
-        // dd($pendingPayments);
 
         // Pesanan terbaru
-        $recentOrders = Pesanan::with('user')
+        $recentOrders = Pesanan::with('pengguna')
             ->latest()
             ->take(10)
             ->get();
@@ -35,6 +35,43 @@ class DashboardController extends Controller
         // Data untuk grafik kategori produk
         $categoryChart = $this->getCategoryChartData();
 
+        // Produk terlaris (berdasarkan jumlah penjualan)
+        $bestSellingProducts = Produk::withCount(['detailPesanan as total_terjual' => function ($query) {
+            $query->select(DB::raw('COALESCE(SUM(jumlah), 0)'));
+        }])
+            ->orderByDesc('total_terjual')
+            ->take(10)
+            ->get();
+
+        // Produk paling sering dilihat
+        $mostViewedProducts = Produk::orderByDesc('dilihat')
+            ->take(10)
+            ->get();
+
+        // Produk dengan rating tertinggi
+        $topRatedProducts = Produk::where('rating', '>', 0)
+            ->orderByDesc('rating')
+            ->take(10)
+            ->get();
+
+        // Produk dengan rating terendah (hanya yang memiliki rating)
+        $lowRatedProducts = Produk::where('rating', '>', 0)
+            ->orderBy('rating')
+            ->take(10)
+            ->get();
+
+        // Produk yang hampir habis stoknya (stok < 10)
+        $lowStockProducts = Produk::where('stok', '<', 10)
+            ->where('stok', '>', 0)
+            ->orderBy('stok')
+            ->take(10)
+            ->get();
+
+        // Produk yang habis stok
+        $outOfStockProducts = Produk::where('stok', '<=', 0)
+            ->take(10)
+            ->get();
+
         return view('admin.dashboard.dashboard', compact(
             'totalOrders',
             'totalRevenue',
@@ -42,7 +79,13 @@ class DashboardController extends Controller
             'pendingPayments',
             'recentOrders',
             'salesChart',
-            'categoryChart'
+            'categoryChart',
+            'bestSellingProducts',
+            'mostViewedProducts',
+            'topRatedProducts',
+            'lowRatedProducts',
+            'lowStockProducts',
+            'outOfStockProducts'
         ));
     }
 
