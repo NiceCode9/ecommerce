@@ -166,6 +166,14 @@ scratch. This page gets rid of all links and provides the needed markup only.
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a href="{{ route('admin.reports.index') }}" class="nav-link">
+                                <i class="nav-icon fas fa-shopping-cart"></i>
+                                <p>
+                                    Laporan Penjualan
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a href="{{ route('logout') }}" class="nav-link"
                                 onclick="event.preventDefault(); document.getElementById('form-logout').submit();">
                                 <i class="fas fa-sign-out-alt nav-icon"></i>

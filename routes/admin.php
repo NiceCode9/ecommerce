@@ -25,6 +25,9 @@ Route::middleware(['auth', 'checkrole:admin'])->prefix('admin')->name('admin.')-
     Route::get('/pesanan', [ManagePesananController::class, 'index'])->name('pesanan.index');
     Route::get('/pesanan/{id}', [ManagePesananController::class, 'show'])->name('pesanan.show');
     Route::post('/pesanan/{id}/update-status', [ManagePesananController::class, 'updateStatus'])->name('pesanan.update-status');
+
+    Route::get('/reports', [\App\Http\Controllers\ReportController::class, 'index'])->name('reports.index');
+    Route::post('/reports/generate', [\App\Http\Controllers\ReportController::class, 'generate'])->name('reports.generate');
 });
 
 
