@@ -102,13 +102,11 @@ class ReportController extends Controller
                             ->where('status', 'selesai');
                     });
             }])
-            ->withSum(['detailPesanan as total_pendapatan' => function ($query) use ($startDate, $endDate) {
-                $query->select(DB::raw('COALESCE(SUM(subtotal), 0)'))
-                    ->whereHas('pesanan', function ($q) use ($startDate, $endDate) {
-                        $q->whereBetween('created_at', [$startDate, $endDate])
-                            ->where('status', 'selesai');
-                    });
-            }])
+            ->withSum('detailPesanan as total_pendapatan', 'subtotal')
+            ->whereHas('detailPesanan.pesanan', function ($query) use ($startDate, $endDate) {
+                $query->whereBetween('created_at', [$startDate, $endDate])
+                    ->where('status', 'selesai');
+            })
             ->orderByDesc('total_terjual')
             ->get();
 
@@ -131,6 +129,7 @@ class ReportController extends Controller
     protected function generateCategoryReport($startDate, $endDate)
     {
         $categories = Kategori::with(['produk'])
+            ->withCount(['produk as total_produk'])
             ->withCount(['produk as total_terjual' => function ($query) use ($startDate, $endDate) {
                 $query->select(DB::raw('COALESCE(SUM(detail_pesanan.jumlah), 0)'))
                     ->join('detail_pesanan', 'detail_pesanan.produk_id', '=', 'produk.id')
@@ -139,12 +138,12 @@ class ReportController extends Controller
                     ->where('pesanan.status', 'selesai');
             }])
             ->withSum(['produk as total_pendapatan' => function ($query) use ($startDate, $endDate) {
-                $query->select(DB::raw('COALESCE(SUM(detail_pesanan.subtotal), 0)'))
-                    ->join('detail_pesanan', 'detail_pesanan.produk_id', '=', 'produk.id')
+                $query->join('detail_pesanan', 'produk.id', '=', 'detail_pesanan.produk_id')
                     ->join('pesanan', 'pesanan.id', '=', 'detail_pesanan.pesanan_id')
                     ->whereBetween('pesanan.created_at', [$startDate, $endDate])
                     ->where('pesanan.status', 'selesai');
-            }])
+            }], 'detail_pesanan.subtotal')
+            // ->having('total_terjual', '>', 0)
             ->orderByDesc('total_pendapatan')
             ->get();
 
@@ -157,7 +156,7 @@ class ReportController extends Controller
         ];
 
         if (request()->has('export') && request()->export == 'pdf') {
-            $pdf = Pdf::loadView('admin.reports.templates.category', $data);
+            $pdf = PDF::loadView('admin.reports.templates.category', $data);
             return $pdf->download('laporan-kategori-' . $startDate->format('Ymd') . '-' . $endDate->format('Ymd') . '.pdf');
         }
 
