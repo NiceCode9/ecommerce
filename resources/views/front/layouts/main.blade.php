@@ -407,7 +407,7 @@
                     <div class="col-md-4">
                         <div class="header-logo">
                             <a href="/" class="logo">
-                                <img src="{{ asset('front') }}/img/logo.png" alt="">
+                                <img src="{{ asset('front/logo.png') }}" alt="">
                             </a>
                         </div>
                     </div>
