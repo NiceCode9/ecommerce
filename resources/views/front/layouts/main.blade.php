@@ -373,14 +373,15 @@
                     <li><a href="#"><i class="fa fa-dollar"></i> IDR</a></li>
                     @auth()
                         <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="true">
+                            <a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown">
                                 <i class="fa fa-user-o"></i> My Account <i class="fa fa-caret-down"></i>
                             </a>
                             <ul class="dropdown-menu">
                                 <li><a href="{{ route('profile.index') }}" class="btn btn-link"
                                         style="text-decoration: none; color: inherit;">Profile</a></li>
                                 <li>
-                                    <a href="#" class="btn btn-link" style="text-decoration: none; color: inherit;"
+                                    <a href="{{ route('logout') }}" class="btn btn-link"
+                                        style="text-decoration: none; color: inherit;"
                                         onclick="event.preventDefault(); document.getElementById('form-logout').submit();">Logout</a>
                                     <form action="{{ route('logout') }}" method="POST" style="display: inline;"
                                         id="form-logout">
@@ -437,7 +438,7 @@
                                 <a href="{{ route('pelanggan.pesanan.index') }}">
                                     <i class="fa fa-heart-o"></i>
                                     <span>Pesanan Saya</span>
-                                    <div class="qty wishlist-qty">
+                                    <div class="qty pesanan-qty">
                                         {{ auth()->check() ? auth()->user()->pesanan()->count() : 0 }}</div>
                                 </a>
                             </div>

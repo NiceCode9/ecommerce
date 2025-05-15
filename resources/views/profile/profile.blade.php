@@ -77,15 +77,29 @@
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label class="form-label">Nama Lengkap</label>
-                                            <input type="text" class="form-control form-control-lg" name="name"
-                                                value="{{ old('name', auth()->user()->name) }}" required>
+                                            <input type="text"
+                                                class="form-control form-control-lg @error('name') is-invalid @enderror"
+                                                name="name" value="{{ old('name', auth()->user()->name) }}" required>
+                                            @error('name')
+                                                <span class="invalid-feedback" role="alert"
+                                                    style="color:#dc3545; font-size: 0.9em; font-style: italic;">
+                                                    <strong>{{ $message }}</strong>
+                                                </span>
+                                            @enderror
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label class="form-label">Email</label>
-                                            <input type="email" class="form-control form-control-lg" name="email"
-                                                value="{{ old('email', auth()->user()->email) }}" required>
+                                            <input type="email"
+                                                class="form-control form-control-lg @error('email') is-invalid @enderror"
+                                                name="email" value="{{ old('email', auth()->user()->email) }}" required>
+                                            @error('email')
+                                                <span class="invalid-feedback" role="alert"
+                                                    style="color:#dc3545; font-size: 0.9em; font-style: italic;">
+                                                    <strong>{{ $message }}</strong>
+                                                </span>
+                                            @enderror
                                         </div>
                                     </div>
                                 </div>
@@ -93,21 +107,38 @@
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label class="form-label">Nomor Telepon</label>
-                                            <input type="text" class="form-control form-control-lg" name="nomor_telepon"
+                                            <input type="text"
+                                                class="form-control form-control-lg @error('nomor_telepon') is-invalid @enderror"
+                                                name="nomor_telepon"
                                                 value="{{ old('nomor_telepon', auth()->user()->nomor_telepon) }}">
+                                            @error('nomor_telepon')
+                                                <span class="invalid-feedback" role="alert"
+                                                    style="color:#dc3545; font-size: 0.9em; font-style: italic;">
+                                                    <strong>{{ $message }}</strong>
+                                                </span>
+                                            @enderror
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label class="form-label">Tanggal Lahir</label>
-                                            <input type="date" class="form-control form-control-lg" name="tanggal_lahir"
-                                                value="{{ old('tanggal_lahir', auth()->user()->tanggal_lahir) }}">
+                                            <input type="date"
+                                                class="form-control form-control-lg @error('tanggal_lahir') is-invalid @enderror"
+                                                name="tanggal_lahir"
+                                                value="{{ old('tanggal_lahir', auth()->user()->tanggal_lahir ? \Carbon\Carbon::parse(auth()->user()->tanggal_lahir)->format('Y-m-d') : null) }}">
+                                            @error('tanggal_lahir')
+                                                <span class="invalid-feedback" role="alert"
+                                                    style="color:#dc3545; font-size: 0.9em; font-style: italic;">
+                                                    <strong>{{ $message }}</strong>
+                                                </span>
+                                            @enderror
                                         </div>
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <label class="form-label">Jenis Kelamin</label>
-                                    <div class="btn-group btn-group-toggle w-100" data-toggle="buttons">
+                                    <div class="btn-group btn-group-toggle w-100 @error('jenis_kelamin') is-invalid @enderror"
+                                        data-toggle="buttons">
                                         <label
                                             class="btn btn-outline-secondary {{ old('jenis_kelamin', auth()->user()->jenis_kelamin) == 'Laki-laki' ? 'active' : '' }}">
                                             <input type="radio" name="jenis_kelamin" value="Laki-laki" autocomplete="off"
@@ -116,17 +147,25 @@
                                         </label>
                                         <label
                                             class="btn btn-outline-secondary {{ old('jenis_kelamin', auth()->user()->jenis_kelamin) == 'Perempuan' ? 'active' : '' }}">
-                                            <input type="radio" name="jenis_kelamin" value="Perempuan" autocomplete="off"
+                                            <input type="radio" name="jenis_kelamin" value="Perempuan"
+                                                autocomplete="off"
                                                 {{ old('jenis_kelamin', auth()->user()->jenis_kelamin) == 'Perempuan' ? 'checked' : '' }}>
                                             Perempuan
                                         </label>
                                         <label
                                             class="btn btn-outline-secondary {{ old('jenis_kelamin', auth()->user()->jenis_kelamin) == 'Lainnya' ? 'active' : '' }}">
-                                            <input type="radio" name="jenis_kelamin" value="Lainnya" autocomplete="off"
+                                            <input type="radio" name="jenis_kelamin" value="Lainnya"
+                                                autocomplete="off"
                                                 {{ old('jenis_kelamin', auth()->user()->jenis_kelamin) == 'Lainnya' ? 'checked' : '' }}>
                                             Lainnya
                                         </label>
                                     </div>
+                                    @error('jenis_kelamin')
+                                        <span class="invalid-feedback d-block" role="alert"
+                                            style="color:#dc3545; font-size: 0.9em; font-style: italic;">
+                                            <strong>{{ $message }}</strong>
+                                        </span>
+                                    @enderror
                                 </div>
                                 <div class="text-right mt-4">
                                     <button type="submit" class="btn btn-primary btn-lg px-4">Simpan Perubahan</button>
@@ -146,17 +185,39 @@
                                 @method('PUT')
                                 <div class="form-group">
                                     <label class="form-label">Password Saat Ini</label>
-                                    <input type="password" class="form-control form-control-lg" name="current_password"
-                                        required>
+                                    <input type="password"
+                                        class="form-control form-control-lg @error('current_password') is-invalid @enderror"
+                                        name="current_password" required>
+                                    @error('current_password')
+                                        <span class="invalid-feedback" role="alert"
+                                            style="color:#dc3545; font-size: 0.9em; font-style: italic;">
+                                            <strong>{{ $message }}</strong>
+                                        </span>
+                                    @enderror
                                 </div>
                                 <div class="form-group">
                                     <label class="form-label">Password Baru</label>
-                                    <input type="password" class="form-control form-control-lg" name="password" required>
+                                    <input type="password"
+                                        class="form-control form-control-lg @error('password') is-invalid @enderror"
+                                        name="password" required>
+                                    @error('password')
+                                        <span class="invalid-feedback" role="alert"
+                                            style="color:#dc3545; font-size: 0.9em; font-style: italic;">
+                                            <strong>{{ $message }}</strong>
+                                        </span>
+                                    @enderror
                                 </div>
                                 <div class="form-group">
                                     <label class="form-label">Konfirmasi Password Baru</label>
-                                    <input type="password" class="form-control form-control-lg"
+                                    <input type="password"
+                                        class="form-control form-control-lg @error('password_confirmation') is-invalid @enderror"
                                         name="password_confirmation" required>
+                                    @error('password_confirmation')
+                                        <span class="invalid-feedback" role="alert"
+                                            style="color:#dc3545; font-size: 0.9em; font-style: italic;">
+                                            <strong>{{ $message }}</strong>
+                                        </span>
+                                    @enderror
                                 </div>
                                 <div class="text-right mt-4">
                                     <button type="submit" class="btn btn-primary btn-lg px-4">Ubah Password</button>
@@ -209,6 +270,7 @@
                     @method('PUT')
                     <input type="hidden" name="id">
                     <input type="hidden" name="api_id">
+                    <input type="hidden" name="label">
                     <div class="modal-header">
                         <h5 class="modal-title">Edit Alamat</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">

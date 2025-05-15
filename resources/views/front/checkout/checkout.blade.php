@@ -191,13 +191,13 @@
                             </div>
 
                             <div class="payment-method">
-                                <div class="input-radio">
+                                {{-- <div class="input-radio">
                                     <input type="radio" name="payment_method" id="payment-1" value="cod" checked>
                                     <label for="payment-1">
                                         <span></span>
                                         COD
                                     </label>
-                                </div>
+                                </div> --}}
                                 <div class="input-radio">
                                     <input type="radio" name="payment_method" id="payment-2" value="midtrans" checked>
                                     <label for="payment-2">

@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Validation\Rules\Password as RulesPassword;
 use Illuminate\View\View;
 
 class ProfileController extends Controller
@@ -34,7 +35,7 @@ class ProfileController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
-            'nomor_telepon' => 'nullable|string|max:15',
+            'nomor_telepon' => 'required|string|max:15',
             'tanggal_lahir' => 'nullable|date',
             'jenis_kelamin' => 'nullable|in:Laki-laki,Perempuan,Lainnya',
         ]);
@@ -57,14 +58,18 @@ class ProfileController extends Controller
     {
         $request->validate([
             'current_password' => ['required', 'current_password'],
-            'password' => ['required', 'confirmed', Password::defaults()],
+            'password' => ['required', 'confirmed', RulesPassword::defaults()],
         ]);
 
         $request->user()->update([
             'password' => Hash::make($request->password),
         ]);
 
-        return back()->with('success', 'Password berhasil diperbarui');
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect('/login')->with('success', 'Password berhasil diperbarui, silakan login kembali');
     }
 
     /**

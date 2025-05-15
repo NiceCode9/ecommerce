@@ -30,6 +30,20 @@
                         {{ session('status') }}
                     </div>
                 @endif
+                @if (session('success'))
+                    <div class="alert alert-success">
+                        {{ session('success') }}
+                    </div>
+                @endif
+                @if ($errors->any())
+                    <div class="alert alert-danger">
+                        <ul class="mb-0">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
                 <p class="login-box-msg">Sign in to start your session</p>
 
                 <form action="{{ url('login') }}" method="post">
@@ -44,11 +58,11 @@
                     </div>
                     <div class="input-group mb-3">
                         <input type="password" name="password" class="form-control" placeholder="Password">
-                        <div class="input-group-append">
+                        {{-- <div class="input-group-append">
                             <div class="input-group-text">
-                                <span class="fas fa-lock"></span>
+                                <span class="fas fa-lock btn-toogle-password"></span>
                             </div>
-                        </div>
+                        </div> --}}
                     </div>
                     <div class="row">
                         {{-- <div class="col-8">
@@ -96,6 +110,30 @@
     <script src="{{ asset('back') }}/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
     <!-- AdminLTE App -->
     <script src="{{ asset('back') }}/dist/js/adminlte.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            // Add toggle button to password input
+            var passwordInput = $('input[name="password"]');
+            var inputGroup = passwordInput.closest('.input-group');
+            var toggleBtn = $(
+                '<div class="input-group-append"><button type="button" class="btn btn-outline-secondary btn-toggle-password"><i class="fas fa-eye"></i></button></div>'
+            );
+            inputGroup.append(toggleBtn);
+
+            inputGroup.on('click', '.btn-toggle-password', function() {
+                var input = passwordInput;
+                var icon = $(this).find('i');
+                if (input.attr('type') === 'password') {
+                    input.attr('type', 'text');
+                    icon.removeClass('fa-eye').addClass('fa-eye-slash');
+                } else {
+                    input.attr('type', 'password');
+                    icon.removeClass('fa-eye-slash').addClass('fa-eye');
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>

@@ -22,6 +22,6 @@
     <h5>SUBTOTAL: Rp {{ number_format($subtotal, 0, ',', '.') }}</h5>
 </div>
 <div class="cart-btns">
-    <a href="{{ route('pelanggan.cart.index') }}">View Cart</a>
-    <a href="">Checkout <i class="fa fa-arrow-circle-right"></i></a>
+    <a href="{{ route('pelanggan.cart.index') }}" style="width: 100%;">View Cart</a>
+    {{-- <a href="">Checkout <i class="fa fa-arrow-circle-right"></i></a> --}}
 </div>

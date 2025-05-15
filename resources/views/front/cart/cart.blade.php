@@ -32,8 +32,8 @@
 
         .product-widget .delete {
             /* position: absolute;
-                                                                                                                                                        right: 0;
-                                                                                                                                                        top: 50%; */
+                                                                                                                                                                                                                right: 0;
+                                                                                                                                                                                                                top: 50%; */
             /* transform: translateY(-50%); */
             background: none;
             border: none;
@@ -141,32 +141,17 @@
 @endsection
 
 
-@push('scripts')
+@push('front-script')
     <script>
+        function removeItem(cartId) {
+            removeCartItem(cartId, {
+                removeRow: true
+            });
+        }
         $(document).ready(function() {
             $(document).on('change', '.cart-item-checkbox', function() {
                 calculateSelectedTotal();
             });
-
-            function removeItem(cartId) {
-                if (!confirm('Are you sure to remove this item?')) return;
-
-                ajaxRequest({
-                    url: `/cart/remove/${cartId}`,
-                    method: 'POST',
-                    data: {
-                        _token: $('meta[name="csrf-token"]').attr('content')
-                    },
-                    success: function(response) {
-                        $(`[data-cart-id="${cartId}"]`).remove();
-                        $('.cart-total').text('Rp ' + response.total);
-                        $('.cart-qty').text(parseInt($('.cart-qty').text()) - 1);
-
-                        removeCartItem(cartId, event);
-                        showToast('Item removed');
-                    }
-                });
-            }
 
             function calculateSelectedTotal() {
                 let total = 0;

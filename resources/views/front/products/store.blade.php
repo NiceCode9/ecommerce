@@ -102,7 +102,7 @@
                                     <label for="brand-{{ $brand->id }}">
                                         <span></span>
                                         {{ $brand->nama }}
-                                        <small>({{ $brand->products_count }})</small>
+                                        <small>({{ $brand->produk_count }})</small>
                                     </label>
                                 </div>
                             @endforeach
@@ -175,7 +175,7 @@
                     <div class="row" id="product-list">
                         @foreach ($products as $product)
                             <div class="col-md-4 col-xs-6">
-                                <div class="product">
+                                <div class="product" data-product-id="{{ $product->id }}">
                                     <div class="product-img">
                                         <img src="{{ $product->gambarUtama ? asset('storage/' . $product->gambarUtama->gambar) : asset('front/img/no-image.png') }}"
                                             alt="{{ $product->nama }}">
@@ -218,10 +218,8 @@
                                                 onclick="toggleWishlist({{ $product->id }})"><i
                                                     class="fa fa-heart-o"></i><span class="tooltipp">add to
                                                     wishlist</span></button>
-                                            <button class="quick-view"
-                                                onclick="location.href='{{ route('produk.detail', $product->slug) }}'"><i
-                                                    class="fa fa-eye"></i><span class="tooltipp">quick
-                                                    view</span></button>
+                                            <button class="quick-view"><i class="fa fa-eye"></i><span
+                                                    class="tooltipp">quick view</span></button>
                                         </div>
                                     </div>
                                     <div class="add-to-cart">

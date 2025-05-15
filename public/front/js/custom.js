@@ -120,10 +120,13 @@ function refreshCartDropdown() {
     $('.cart-list').css('overflow-y', 'auto');
 }
 
-// Fungsi untuk remove item dari cart
-function removeCartItem(cartId, event) {
-    event.preventDefault();
-    event.stopPropagation();
+// Fungsi untuk remove item dari cart (reusable)
+function removeCartItem(cartId, options = {}) {
+    // options: { event, removeRow: true/false }
+    if (options.event) {
+        options.event.preventDefault();
+        options.event.stopPropagation();
+    }
 
     if (!confirm('Are you sure to remove this item?')) return;
     var isCartOpen = $('.dropdown-toggle').parent().hasClass('open');
@@ -135,13 +138,27 @@ function removeCartItem(cartId, event) {
             _token: $('meta[name="csrf-token"]').attr('content')
         },
         success: function (response) {
-            $('.cart-qty').text(response.count);
+            // Remove row from cart table if needed
+            if (options.removeRow) {
+                $(`[data-cart-id="${cartId}"]`).remove();
+            }
 
-            // Update konten dropdown
-            $('.cart-dropdown').html(response.html);
+            // Update konten dropdown jika ada
+            if (response.html) {
+                $('.cart-dropdown').html(response.html);
+                refreshCartDropdown();
+            }
 
-            // Perbaiki scrollbar
-            refreshCartDropdown();
+            // Update counter
+            if (response.count !== undefined) {
+                $('.cart-qty').text(response.count);
+            }
+            if (response.total !== undefined) {
+                $('.cart-total').text('Rp ' + response.total);
+            }
+            if (response.total_item !== undefined) {
+                $('.cart-qty').text(response.total_item);
+            }
 
             // Kembalikan state dropdown
             if (isCartOpen) {
@@ -189,55 +206,56 @@ function checkAuth() {
     }
     return true;
 }
-function searchAddress() {
-    const keyword = $('#addressSearchInput').val().trim();
-    if (keyword.length < 3) {
-        showToast('Masukkan minimal 3 karakter', 'error');
-        return;
-    }
 
-    $('#searchLoading').show();
-    $('#addressResults').empty();
-    $('#noResults').hide();
+// function searchAddress() {
+//     const keyword = $('#addressSearchInput').val().trim();
+//     if (keyword.length < 3) {
+//         showToast('Masukkan minimal 3 karakter', 'error');
+//         return;
+//     }
 
-    ajaxRequest({
-        url: '/get-wilayah',
-        type: 'GET',
-        data: { keyword: keyword },
-        success: function (response) {
-            $('#searchLoading').hide();
+//     $('#searchLoading').show();
+//     $('#addressResults').empty();
+//     $('#noResults').hide();
 
-            if (response.data && response.data.length > 0) {
-                const $tbody = $('#addressResults');
-                response.data.forEach(address => {
-                    $tbody.append(`
-                        <tr>
-                            <td>
-                                <strong>${address.label || address.district_name}</strong><br>
-                                <small class="text-muted">
-                                    ${address.subdistrict_name}, ${address.city_name}, ${address.province_name}
-                                </small>
-                            </td>
-                            <td>${address.zip_code || '-'}</td>
-                            <td>
-                                <button class="btn btn-sm btn-primary select-address"
-                                    data-address='${JSON.stringify(address)}'>
-                                    Pilih
-                                </button>
-                            </td>
-                        </tr>
-                    `);
-                });
-            } else {
-                $('#noResults').show();
-            }
-        },
-        error: function (xhr) {
-            $('#searchLoading').hide();
-            showToast('Terjadi kesalahan saat mencari alamat', 'error');
-        }
-    });
-}
+//     ajaxRequest({
+//         url: '/get-wilayah',
+//         type: 'GET',
+//         data: { keyword: keyword },
+//         success: function (response) {
+//             $('#searchLoading').hide();
+
+//             if (response.data && response.data.length > 0) {
+//                 const $tbody = $('#addressResults');
+//                 response.data.forEach(address => {
+//                     $tbody.append(`
+//                         <tr>
+//                             <td>
+//                                 <strong>${address.label || address.district_name}</strong><br>
+//                                 <small class="text-muted">
+//                                     ${address.subdistrict_name}, ${address.city_name}, ${address.province_name}
+//                                 </small>
+//                             </td>
+//                             <td>${address.zip_code || '-'}</td>
+//                             <td>
+//                                 <button class="btn btn-sm btn-primary select-address"
+//                                     data-address='${JSON.stringify(address)}'>
+//                                     Pilih
+//                                 </button>
+//                             </td>
+//                         </tr>
+//                     `);
+//                 });
+//             } else {
+//                 $('#noResults').show();
+//             }
+//         },
+//         error: function (xhr) {
+//             $('#searchLoading').hide();
+//             showToast('Terjadi kesalahan saat mencari alamat', 'error');
+//         }
+//     });
+// }
 
 // Fungsi untuk tampilkan toast notifikasi
 function showToast(message, type = 'success') {
@@ -586,10 +604,10 @@ $(document).ready(function () {
         $('.modal-backdrop').not(':first').remove();
     });
 
-    $('#addressSearchTrigger').click(function () {
-        // $('#addAddressModal').modal('hide'); // Sembunyikan sementara modal parent
-        $('#searchAddressModal').modal('show');
-    });
+    // $('#addressSearchTrigger').click(function () {
+    //     // $('#addAddressModal').modal('hide'); // Sembunyikan sementara modal parent
+    //     $('#searchAddressModal').modal('show');
+    // });
 
     // Saat modal pencarian ditutup
     // $('#searchAddressModal').on('hidden.bs.modal', function () {
@@ -631,6 +649,7 @@ $(document).ready(function () {
     $(document).on('click', '.select-address', function () {
         const address = $(this).data('address');
         const $activeForm = $('#searchAddressModal').data('active-form');
+        console.log(address);
 
         // Isi field-field di form yang aktif (tambah/edit)
         $($activeForm + ' input[name="provinsi"]').val(address.province_name);
