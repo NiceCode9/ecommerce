@@ -41,9 +41,9 @@ class ImportMaster extends Command
 
         DB::beginTransaction();
         try {
-            // Excel::import(new BrandImport, $brand);
-            // Excel::import(new KategoriImport, $kategori);
-            // Excel::import(new SocketImport, $socket);
+            Excel::import(new BrandImport, $brand);
+            Excel::import(new KategoriImport, $kategori);
+            Excel::import(new SocketImport, $socket);
             Excel::import(new ProdukImport, $produk);
 
             DB::commit();
