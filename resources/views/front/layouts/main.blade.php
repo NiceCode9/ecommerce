@@ -377,7 +377,7 @@
                                 <i class="fa fa-user-o"></i> My Account <i class="fa fa-caret-down"></i>
                             </a>
                             <ul class="dropdown-menu">
-                                <li><a href="#" class="btn btn-link"
+                                <li><a href="{{ route('profile.index') }}" class="btn btn-link"
                                         style="text-decoration: none; color: inherit;">Profile</a></li>
                                 <li>
                                     <a href="#" class="btn btn-link" style="text-decoration: none; color: inherit;"
