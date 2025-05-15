@@ -182,13 +182,13 @@ function updateQuantity(cartId, change) {
 }
 
 // Fungsi untuk cek auth
-// function checkAuth() {
-//     if ($('meta[name="authenticated"]').attr('content') === 'false') {
-//         window.location.href = '/login?redirect=' + encodeURIComponent(window.location.pathname);
-//         return false;
-//     }
-//     return true;
-// }
+function checkAuth() {
+    if ($('meta[name="authenticated"]').attr('content') === 'false') {
+        window.location.href = '/login?redirect=' + encodeURIComponent(window.location.pathname);
+        return false;
+    }
+    return true;
+}
 function searchAddress() {
     const keyword = $('#addressSearchInput').val().trim();
     if (keyword.length < 3) {
@@ -320,10 +320,12 @@ function getAlamatCheckout() {
 
     $.ajax({
         type: "GET",
-        url: "/alamat/get-alamat-pelanggan", // Endpoint khusus checkout
+        url: "/alamat/get-alamat-pelanggan",
         dataType: "json",
         success: function (response) {
             let options = '<option value="">--pilih alamat--</option>';
+            console.log(response);
+
             $.each(response, function (i, val) {
                 options += `
                     <option value="${val.id}"
@@ -637,6 +639,8 @@ $(document).ready(function () {
         $($activeForm + ' input[name="kelurahan"]').val(address.district_name);
         $($activeForm + ' input[name="kode_pos"]').val(address.zip_code);
         $($activeForm + ' input[name="api_id"]').val(address.id);
+        $($activeForm + ' input[name="label"]').val(address.label);
+
 
 
         // Update tampilan field pencarian
@@ -669,6 +673,7 @@ $(document).ready(function () {
                     $('#addAddressModal').modal('hide');
                     showToast('Alamat berhasil ditambahkan');
 
+                    // getAlamatCheckout();
                     // Panggil fungsi refresh yang sesuai berdasarkan halaman
                     if (window.location.pathname.includes('checkout')) {
                         getAlamatCheckout();
