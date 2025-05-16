@@ -410,7 +410,7 @@
 
                 // Reset semua pilihan
                 selectedComponents = {};
-                $('#save-build').prop('disabled', true);
+                // $('#save-build').prop('disabled', true);
             });
 
             // Perubahan Brand Select - hanya relevan di mode kompatibilitas
@@ -473,7 +473,7 @@
             $('#ram-select').change(function() {
                 selectedComponents.ram = $(this).val();
                 changePrice('ram');
-                $('#save-build').prop('disabled', false);
+                // $('#save-build').prop('disabled', false);
             });
 
             // Handler perubahan komponen untuk kategori dinamis

@@ -129,7 +129,7 @@ class CheckOutController extends Controller
                     'nama_produk' => $cart->produk->nama,
                     'harga' => $cart->produk->harga_setelah_diskon,
                     'jumlah' => $cart->jumlah ?? $cart->quantity,
-                    'subtotal' => $cart->produk->harga_setelah_diskon * ($cart->jumlah ?? $item->quantity)
+                    'subtotal' => $cart->produk->harga_setelah_diskon * ($cart->jumlah ?? $cart->quantity)
                 ]);
             }
 
@@ -171,7 +171,7 @@ class CheckOutController extends Controller
                 : redirect()->away($paymentUrl);
         } catch (\Exception $e) {
             DB::rollBack();
-            dd($e->getMessage());
+            dd($e);
             return back()->with('error', 'Checkout gagal: ' . $e->getMessage());
         }
     }

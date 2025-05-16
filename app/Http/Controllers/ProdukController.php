@@ -97,8 +97,8 @@ class ProdukController extends Controller
             'garansi_bulan' => 'nullable|integer|min:0',
             'is_aktif' => 'required|boolean',
             'gambar.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'nama_spek.*' => 'nullable|array',
-            'nilai' => 'nullable|array',
+            'nama_spek.*' => 'nullable',
+            'nilai' => 'nullable',
         ];
 
         // Ambil kategori untuk penentuan validasi
@@ -130,7 +130,7 @@ class ProdukController extends Controller
             foreach ($request->nama_spek as $key => $nama) {
                 if (isset($request->nilai[$key])) {
                     $spesifikasi[] = [
-                        'nama_spek' => $nama,
+                        'nama' => $nama,
                         'nilai' => $request->nilai[$key]
                     ];
                 }
@@ -240,8 +240,8 @@ class ProdukController extends Controller
             'garansi_bulan' => 'nullable|integer|min:0',
             'is_aktif' => 'required|boolean',
             'gambar.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'nama_spek.*' => 'nullable|array',
-            'nilai' => 'nullable|array',
+            'nama_spek.*' => 'nullable',
+            'nilai' => 'nullable',
         ];
 
         // Ambil kategori untuk penentuan validasi
@@ -273,7 +273,7 @@ class ProdukController extends Controller
             foreach ($request->nama_spek as $key => $nama) {
                 if (isset($request->nilai[$key])) {
                     $spesifikasi[] = [
-                        'nama_spek' => $nama,
+                        'nama' => $nama,
                         'nilai' => $request->nilai[$key]
                     ];
                 }

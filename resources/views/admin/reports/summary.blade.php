@@ -64,15 +64,16 @@
         </div>
         <div class="card-footer">
             <a href="{{ route('admin.reports.index') }}" class="btn btn-default">Kembali</a>
-            <a href="{{ route('admin.reports.generate', [
-                'start_date' => request()->start_date,
-                'end_date' => request()->end_date,
-                'report_type' => 'summary',
-                'export' => 'pdf',
-            ]) }}"
-                class="btn btn-danger float-right">
-                <i class="fas fa-file-pdf"></i> Export PDF
-            </a>
+            <form action="{{ route('admin.reports.generate') }}" method="POST" class="d-inline float-right">
+                @csrf
+                <input type="hidden" name="start_date" value="{{ request()->start_date }}">
+                <input type="hidden" name="end_date" value="{{ request()->end_date }}">
+                <input type="hidden" name="report_type" value="summary">
+                <input type="hidden" name="export" value="pdf">
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-file-pdf"></i> Export PDF
+                </button>
+            </form>
         </div>
     </div>
 @endsection

@@ -330,7 +330,7 @@
                                                         <td>
                                                             <input type="text" name="nama_spek[]"
                                                                 class="form-control @error('nama_spek.*') is-invalid @enderror"
-                                                                value="{{ $spesifikasi->nama_spek }}">
+                                                                value="{{ $spesifikasi->nama }}">
                                                             @error('nama_spek.*')
                                                                 <div class="invalid-feedback">{{ $message }}</div>
                                                             @enderror
