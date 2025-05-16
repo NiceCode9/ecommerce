@@ -33,7 +33,7 @@ class ImportMaster extends Command
     public function handle()
     {
         $brand = public_path('brands.xlsx');
-        $kategori = public_path('kategori.xlsx');
+        // $kategori = public_path('kategori.xlsx');
         $socket = public_path('socket.xlsx');
         $produk = public_path('produk.xlsx');
 
@@ -42,7 +42,7 @@ class ImportMaster extends Command
         DB::beginTransaction();
         try {
             Excel::import(new BrandImport, $brand);
-            Excel::import(new KategoriImport, $kategori);
+            // Excel::import(new KategoriImport, $kategori);
             Excel::import(new SocketImport, $socket);
             Excel::import(new ProdukImport, $produk);
 

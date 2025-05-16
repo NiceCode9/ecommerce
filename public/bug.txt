@@ -38,8 +38,8 @@ halaman home
 -pada top selling list laptop, smartphone bisa dihailangkan atau diganti kategori (x)
 -banner dibawah countdown dihilangkan sementara tdk apa2 (x)
 -pada header telfon, email, alamat diganti [0822-3198-8816, pesonacomputer@gmail.com, Jl. Raya Cangkringrandu No.10, Perak, Kabupaten Jombang]
--Sign Up for the NEWSLETTER dihapus/diganti saja
-- footer yg tidak digunakan dihapus atau biarkan tidak apa2
+-Sign Up for the NEWSLETTER dihapus/diganti saja (x)
+- footer yg tidak digunakan dihapus atau biarkan tidak apa2 (x)
 -gambar
 
 halaman produk
