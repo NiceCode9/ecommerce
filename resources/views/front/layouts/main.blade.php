@@ -370,7 +370,7 @@
                     <li><a href="#"><i class="fa fa-map-marker"></i> 1734 Stonecoal Road</a></li>
                 </ul>
                 <ul class="header-links pull-right">
-                    <li><a href="#"><i class="fa fa-dollar"></i> IDR</a></li>
+                    {{-- <li><a href="#"><i class="fa fa-dollar"></i> IDR</a></li> --}}
                     @auth()
                         <li class="dropdown">
                             <a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown">
@@ -436,7 +436,7 @@
                             <!-- Wishlist -->
                             <div>
                                 <a href="{{ route('pelanggan.pesanan.index') }}">
-                                    <i class="fa fa-heart-o"></i>
+                                    <i class="fa fa-file-text-o"></i>
                                     <span>Pesanan Saya</span>
                                     <div class="qty pesanan-qty">
                                         {{ auth()->check() ? auth()->user()->pesanan()->count() : 0 }}</div>
@@ -535,7 +535,7 @@
     <!-- /SECTION -->
 
     <!-- NEWSLETTER -->
-    <div id="newsletter" class="section">
+    {{-- <div id="newsletter" class="section">
         <!-- container -->
         <div class="container">
             <!-- row -->
@@ -567,7 +567,7 @@
             <!-- /row -->
         </div>
         <!-- /container -->
-    </div>
+    </div> --}}
     <!-- /NEWSLETTER -->
 
     <!-- FOOTER -->
@@ -577,7 +577,8 @@
             <!-- container -->
             <div class="container">
                 <!-- row -->
-                <div class="row">
+                <div class="row justify-content-center">
+                    <div class="col-md-3"></div>
                     <div class="col-md-3 col-xs-6">
                         <div class="footer">
                             <h3 class="footer-title">About Us</h3>
@@ -605,21 +606,23 @@
                     </div>
 
                     <div class="clearfix visible-xs"></div>
+                    <div class="col-md-3"></div>
 
-                    <div class="col-md-3 col-xs-6">
-                        <div class="footer">
-                            <h3 class="footer-title">Information</h3>
-                            <ul class="footer-links">
-                                <li><a href="#">About Us</a></li>
-                                <li><a href="#">Contact Us</a></li>
-                                <li><a href="#">Privacy Policy</a></li>
-                                <li><a href="#">Orders and Returns</a></li>
-                                <li><a href="#">Terms & Conditions</a></li>
-                            </ul>
-                        </div>
-                    </div>
 
-                    <div class="col-md-3 col-xs-6">
+                    {{-- <div class="col-md-3 col-xs-6">
+                            <div class="footer">
+                                <h3 class="footer-title">Information</h3>
+                                <ul class="footer-links">
+                                    <li><a href="#">About Us</a></li>
+                                    <li><a href="#">Contact Us</a></li>
+                                    <li><a href="#">Privacy Policy</a></li>
+                                    <li><a href="#">Orders and Returns</a></li>
+                                    <li><a href="#">Terms & Conditions</a></li>
+                                </ul>
+                            </div>
+                        </div> --}}
+
+                    {{-- <div class="col-md-3 col-xs-6">
                         <div class="footer">
                             <h3 class="footer-title">Service</h3>
                             <ul class="footer-links">
@@ -630,7 +633,7 @@
                                 <li><a href="#">Help</a></li>
                             </ul>
                         </div>
-                    </div>
+                    </div> --}}
                 </div>
                 <!-- /row -->
             </div>

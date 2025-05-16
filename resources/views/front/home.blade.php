@@ -68,14 +68,14 @@
                 <div class="col-md-12">
                     <div class="section-title">
                         <h3 class="title">New Products</h3>
-                        <div class="section-nav">
+                        {{-- <div class="section-nav">
                             <ul class="section-tab-nav tab-nav">
                                 <li class="active"><a data-toggle="tab" href="#tab1">Laptops</a></li>
                                 <li><a data-toggle="tab" href="#tab1">Smartphones</a></li>
                                 <li><a data-toggle="tab" href="#tab1">Cameras</a></li>
                                 <li><a data-toggle="tab" href="#tab1">Accessories</a></li>
                             </ul>
-                        </div>
+                        </div> --}}
                     </div>
                 </div>
                 <!-- /section title -->
@@ -95,9 +95,9 @@
                                                     <img src="{{ asset('storage/' . $product->gambarUtama->gambar) }}"
                                                         alt="{{ $product->nama }}">
                                                 @else
-                                                    <img src="{{ asset('storage/default-image.png') }}" alt="Default Image">
+                                                    <img src="{{ asset('front/default-image.jpg') }}" alt="Default Image">
                                                 @endif
-                                                @if ($product->diskon)
+                                                @if ($product->diskon > 0)
                                                     <div class="product-label">
                                                         <span class="sale">-{{ $product->diskon }}%</span>
                                                         @if ($product->is_new)
@@ -113,7 +113,7 @@
                                                 </h3>
                                                 <h4 class="product-price">
                                                     Rp {{ number_format($product->harga_setelah_diskon, 0, ',', '.') }}
-                                                    @if ($product->diskon)
+                                                    @if ($product->diskon > 0)
                                                         <del class="product-old-price">Rp
                                                             {{ number_format($product->harga, 0, ',', '.') }}</del>
                                                     @endif
@@ -220,12 +220,12 @@
                     <div class="section-title">
                         <h3 class="title">Top selling</h3>
                         <div class="section-nav">
-                            <ul class="section-tab-nav tab-nav">
+                            {{-- <ul class="section-tab-nav tab-nav">
                                 <li class="active"><a data-toggle="tab" href="#tab2">Laptops</a></li>
                                 <li><a data-toggle="tab" href="#tab2">Smartphones</a></li>
                                 <li><a data-toggle="tab" href="#tab2">Cameras</a></li>
                                 <li><a data-toggle="tab" href="#tab2">Accessories</a></li>
-                            </ul>
+                            </ul> --}}
                         </div>
                     </div>
                 </div>
@@ -246,10 +246,10 @@
                                                     <img src="{{ asset('storage/' . $product->gambarUtama->gambar) }}"
                                                         alt="{{ $product->nama }}">
                                                 @else
-                                                    <img src="{{ asset('storage/default-image.png') }}"
+                                                    <img src="{{ asset('front/default-image.jpg') }}"
                                                         alt="Default Image">
                                                 @endif
-                                                @if ($product->diskon)
+                                                @if ($product->diskon > 0)
                                                     <div class="product-label">
                                                         <span class="sale">-{{ $product->diskon }}%</span>
                                                         @if ($product->is_new)
@@ -265,7 +265,7 @@
                                                 </h3>
                                                 <h4 class="product-price">
                                                     Rp {{ number_format($product->harga_setelah_diskon, 0, ',', '.') }}
-                                                    @if ($product->diskon)
+                                                    @if ($product->diskon > 0)
                                                         <del class="product-old-price">Rp
                                                             {{ number_format($product->harga, 0, ',', '.') }}</del>
                                                     @endif

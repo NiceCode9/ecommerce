@@ -116,7 +116,7 @@
                         @foreach ($topSelling as $product)
                             <div class="product-widget">
                                 <div class="product-img">
-                                    <img src="{{ $product->gambarUtama ? asset('storage/' . $product->gambarUtama->gambar) : asset('front/img/no-image.png') }}"
+                                    <img src="{{ $product->gambarUtama ? asset('storage/' . $product->gambarUtama->gambar) : asset('front/default-image.jpg') }}"
                                         alt="{{ $product->nama }}">
                                 </div>
                                 <div class="product-body">
@@ -177,7 +177,7 @@
                             <div class="col-md-4 col-xs-6">
                                 <div class="product" data-product-id="{{ $product->id }}">
                                     <div class="product-img">
-                                        <img src="{{ $product->gambarUtama ? asset('storage/' . $product->gambarUtama->gambar) : asset('front/img/no-image.png') }}"
+                                        <img src="{{ $product->gambarUtama ? asset('storage/' . $product->gambarUtama->gambar) : asset('front/default-image.jpg') }}"
                                             alt="{{ $product->nama }}">
                                         @if ($product->diskon > 0)
                                             <div class="product-label">

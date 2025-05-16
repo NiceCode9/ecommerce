@@ -31,12 +31,12 @@ fitur checkout
 
 halaman home
 -laptop collection dihapus saja/ diganti banner (Golek o gambar)
--icon compare dihilangkan saja
--pada new products harga barang saat tdk diskon tetapi dicoret dengan harga yg sama, seharusnya kalau tidak diskon, tidak dicoret
--pada new product list laptop, smartphone bisa dihilangkan atau diganti kategori
--pada top selling harga barang saat tdk diskon tetapi dicoret dengan harga yg sama, seharusnya kalau tidak diskon, tidak dicoret
--pada top selling list laptop, smartphone bisa dihailangkan atau diganti kategori
--banner dibawah countdown dihilangkan sementara tdk apa2
+-icon compare dihilangkan saja (x)
+-pada new products harga barang saat tdk diskon tetapi dicoret dengan harga yg sama, seharusnya kalau tidak diskon, tidak dicoret (x)
+-pada new product list laptop, smartphone bisa dihilangkan atau diganti kategori (x)
+-pada top selling harga barang saat tdk diskon tetapi dicoret dengan harga yg sama, seharusnya kalau tidak diskon, tidak dicoret (x)
+-pada top selling list laptop, smartphone bisa dihailangkan atau diganti kategori (x)
+-banner dibawah countdown dihilangkan sementara tdk apa2 (x)
 -pada header telfon, email, alamat diganti [0822-3198-8816, pesonacomputer@gmail.com, Jl. Raya Cangkringrandu No.10, Perak, Kabupaten Jombang]
 -Sign Up for the NEWSLETTER dihapus/diganti saja
 - footer yg tidak digunakan dihapus atau biarkan tidak apa2
@@ -63,7 +63,7 @@ katalog produk
  -tidak bisa menambah jenis spesifikasi
 
 pelaporan
--jika sudah set tanggal dan pilih jenis laporan, kmdian klik generate laporan, dan mau klik tombol export pdf, tidak bisa kluar pdf 
+-jika sudah set tanggal dan pilih jenis laporan, kmdian klik generate laporan, dan mau klik tombol export pdf, tidak bisa kluar pdf
 
 
 
