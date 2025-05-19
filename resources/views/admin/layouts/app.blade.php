@@ -8,6 +8,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>AdminLTE 3 | Starter</title>
 
     <!-- Google Font: Source Sans Pro -->
@@ -130,7 +131,14 @@ scratch. This page gets rid of all links and provides the needed markup only.
                                     <a href="{{ route('admin.kategori.index') }}"
                                         class="nav-link {{ request()->routeIs('admin.kategori*') ? 'active' : '' }}">
                                         <i class="far fa-circle nav-icon"></i>
-                                        <p>Kategori</p>
+                                        <p>Kategori Produk</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.kategori-rakitan.index') }}"
+                                        class="nav-link {{ request()->routeIs('admin.kategori-rakitan*') ? 'active' : '' }}">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Kategori Rakitan</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
@@ -259,6 +267,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <script src="{{ asset('back') }}/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
     <script src="{{ asset('back') }}/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="{{ asset('front/js/custom.js') }}"></script>
 
     <script>
         $(document).ready(function() {

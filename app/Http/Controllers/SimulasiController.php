@@ -7,6 +7,7 @@ use App\Models\BuildComponent;
 use App\Models\Produk;
 use App\Models\Brand;
 use App\Models\Kategori;
+use App\Models\KategoriBuild;
 use App\Models\Socket;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -39,6 +40,32 @@ class SimulasiController extends Controller
         return view('front.simulasi.index', compact('brands', 'kategori', 'sockets', 'processors', 'motherboards', 'rams', 'initialData'));
     }
 
+    public function adminIndex()
+    {
+        $data = Build::whereNotNull('kategori_id')->get();
+        return view('admin.rakitan.index', compact('data'));
+    }
+
+    public function adminCreate()
+    {
+        $brands = Brand::where('is_processor', true)->get();
+        $kategori = Kategori::whereHas('children')->where('tipe', 'general')->orderBy('nama', 'ASC')->get();
+        $sockets = Socket::with('brand')->get();
+        $processors = Produk::with(['kategori' => fn($q) => $q->where('tipe', 'processor')])
+            ->get();
+        $motherboards = Produk::with(['kategori' => fn($q) => $q->where('tipe', 'motherboard')])
+            ->get();
+        // $rams = Produk::with(['kategori' => fn($q) => $q->where('tipe', 'memory')])
+        //     ->get();
+        $rams = Produk::whereHas('kategori', function ($query) {
+            $query->where('tipe', 'memory');
+        })->get();
+        $kategoriBuilds = KategoriBuild::orderBy('nama', 'asc')->get();
+
+
+        return view('admin.rakitan.create', compact('brands', 'kategori', 'kategoriBuilds', 'sockets', 'processors', 'motherboards', 'rams'));
+    }
+
     public function getSockets(Request $request)
     {
         $sockets = Socket::where('brand_id', $request->brand_id)->get();
@@ -69,6 +96,71 @@ class SimulasiController extends Controller
         $query->whereHas('kategori', fn($q) => $q->where('tipe', $type));
 
         return response()->json($query->get());
+    }
+
+    public function saveBuildAdmin(Request $request)
+    {
+        // $request->validate([
+        //     'description' => 'required',
+        //     'brand_id' => 'required',
+        //     'socket_id' => 'required',
+        //     'kategoriBuild_id' => 'required',
+        // ]);
+
+        DB::beginTransaction();
+        try {
+            $kategoriBuild = KategoriBuild::find($request->kategoriBuild_id);
+            $words = explode(' ', $kategoriBuild->nama);
+            $initial = '';
+            foreach ($words as $word) {
+                if (!empty($word)) {
+                    $initial .= strtoupper($word[0]);
+                }
+            }
+            $kode = 'SML-' . $initial . '-' . strtoupper(uniqid());
+            $name = $kode;
+            $slug = Str::slug($name);
+            $componentsData = [];
+
+            foreach ($request->components as $componentType => $component) {
+                $componentsData[] = [
+                    'produk_id' => $component['id'],
+                    'component_type' => $componentType,
+                    'quantity' => $component['quantity'],
+                    'subtotal' => $component['subtotal'],
+                ];
+            }
+
+            $build = Build::create([
+                'kode' => $kode,
+                'user_id' => auth()->user()->id,
+                'kategori_id' => $request->kategoriBuild_id,
+                'name' => $kode,
+                'slug' => $slug,
+                'description' => $request->description,
+                'total_price' => $request->total_price,
+                'mode' => $request->mode,
+                'status' => 'published',
+                'brand_id' => $request->brand_id,
+                'socket_id' => $request->socket_id,
+            ]);
+
+            foreach ($componentsData as $component) {
+                $build->components()->create($component);
+            }
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+            ]);
+        } catch (\Throwable $th) {
+            //throw $th;
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal menyimpan rakitan: ' . $th->getMessage()
+            ], 500);
+        }
     }
 
     public function saveBuild(Request $request)
@@ -117,7 +209,6 @@ class SimulasiController extends Controller
                 'total_price' => $totalPrice,
                 'mode' => $request->mode,
                 'status' => 'draft',
-                // 'is_public' => $request->is_public ?? false,
             ]);
 
             // Add components to the build

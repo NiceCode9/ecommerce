@@ -2,9 +2,11 @@
 
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\KategoriBuildController;
 use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\ManagePesananController;
 use App\Http\Controllers\ProdukController;
+use App\Http\Controllers\SimulasiController;
 use App\Http\Controllers\SocketController;
 use Illuminate\Support\Facades\Route;
 
@@ -15,6 +17,7 @@ Route::middleware(['auth', 'checkrole:admin'])->prefix('admin')->name('admin.')-
     Route::resource('brand', BrandController::class)->except(['show']);
     Route::resource('socket', SocketController::class)->except(['show']);
     Route::resource('produk', ProdukController::class);
+    Route::resource('kategori-rakitan', KategoriBuildController::class)->except(['show']);
 
     Route::delete('produk/gambar/{gambar}', [ProdukController::class, 'destroyGambar'])->name('produk.destroyGambar');
     Route::get('/produk/{id}/gambar', [ProdukController::class, 'getGambar'])->name('produk.getgambar');
@@ -28,6 +31,10 @@ Route::middleware(['auth', 'checkrole:admin'])->prefix('admin')->name('admin.')-
 
     Route::get('/reports', [\App\Http\Controllers\ReportController::class, 'index'])->name('reports.index');
     Route::post('/reports/generate', [\App\Http\Controllers\ReportController::class, 'generate'])->name('reports.generate');
+
+    Route::get('/rakitan', [SimulasiController::class, 'adminIndex'])->name('rakit.index');
+    Route::get('/rakitan/create', [SimulasiController::class, 'adminCreate'])->name('rakit.create');
+    Route::post('/rakitan', [SimulasiController::class, 'saveBuildAdmin'])->name('rakit.store');
 });
 
 
