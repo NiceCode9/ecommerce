@@ -14,6 +14,7 @@ use App\Http\Controllers\SocketController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/simulasi', [SimulasiController::class, 'index'])->name('simulasi.index');
+Route::get('/simulasi/rekomendasi', [SimulasiController::class, 'rekomendasi'])->name('simulasi.rekomendasi');
 Route::get('/simulasi/api/components/{type}', [SimulasiController::class, 'getComponents'])->name('simulasi.getComponents');
 Route::get('/simulasi/api/sockets', [SimulasiController::class, 'getSockets'])->name('simulasi.getSockets');
 
@@ -64,7 +65,5 @@ Route::middleware(['auth', 'checkrole:pelanggan'])
         Route::get('/simulasi/list', [SimulasiController::class, 'list'])->name('simulasi.list');
         Route::get('/simulasi/{build}', [SimulasiController::class, 'show'])->name('simulasi.show');
         Route::delete('/simulasi/{build}', [SimulasiController::class, 'destroy'])->name('simulasi.destroy');
-
-        Route::get('/simulasi/rekomendasi', [SimulasiController::class, 'rekomendasi'])->name('simulasi.rekomendasi');
         // });
     });

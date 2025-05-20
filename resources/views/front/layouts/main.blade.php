@@ -519,6 +519,9 @@
                             <li>
                                 <a href="{{ route('pelanggan.simulasi.list') }}" class="">List Simulasi</a>
                             </li>
+                            <li>
+                                <a href="{{ route('simulasi.rekomendasi') }}" class="">Rekomendasi Build</a>
+                            </li>
                         </ul>
                     </li>
                 </ul>

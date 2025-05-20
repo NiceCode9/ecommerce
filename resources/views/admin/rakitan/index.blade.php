@@ -27,8 +27,19 @@
                                         <td>{{ $item->kode }}</td>
                                         <td>{{ $item->kategori->nama }}</td>
                                         <td>{{ $item->description }}</td>
-                                        <td>{{ $item->total_price }}</td>
-                                        <td></td>
+                                        <td>Rp. {{ number_format($item->total_price, 0, ',', '.') }}</td>
+                                        <td>
+                                            <a href="{{ route('admin.rakit.edit', $item) }}" class="btn btn-warning btn-sm"
+                                                title="Edit Rakitan">Edit</a>
+                                            <form action="{{ route('admin.rakit.destroy', $item) }}" method="POST"
+                                                class="d-inline">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-danger btn-sm"
+                                                    onclick="return confirm('Are you sure you want to delete this item?')"
+                                                    title="Delete Rakitan">Delete</button>
+                                            </form>
+                                        </td>
                                     </tr>
                                 @endforeach
                             </tbody>

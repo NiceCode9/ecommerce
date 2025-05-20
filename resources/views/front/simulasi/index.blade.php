@@ -77,7 +77,7 @@
     <div class="section">
         <div class="container">
             <!-- Search Header -->
-            <div class="row">
+            {{-- <div class="row">
                 <div class="col-md-12">
                     <div class="search-header">
                         <h4 class="mb-4">Cari Kode Simulasi</h4>
@@ -89,7 +89,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> --}}
 
             <!-- Main Form -->
             <div class="row">

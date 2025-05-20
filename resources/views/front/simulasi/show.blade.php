@@ -84,9 +84,9 @@
                         </div>
 
                         <div class="mt-4 d-flex justify-content-between">
-                            <a href="{{ route('pelanggan.simulasi.list') }}" class="btn btn-secondary">
+                            {{-- <a href="{{ route('pelanggan.simulasi.list') }}" class="btn btn-secondary">
                                 <i class="fa fa-arrow-left"></i> Kembali ke Daftar
-                            </a>
+                            </a> --}}
                             {{-- <div> --}}
                             <a href="{{ route('simulasi.index') }}" class="btn btn-primary">
                                 <i class="fa fa-plus"></i> Buat Rakitan Baru

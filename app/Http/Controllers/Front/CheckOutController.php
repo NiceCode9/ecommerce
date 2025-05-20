@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Front;;
 use App\Http\Controllers\Controller;
 use App\Http\Services\RajaOngkirService;
 use App\Models\Alamat;
+use App\Models\Build;
 use App\Models\BuildComponent;
 use App\Models\DetailPesanan;
 use App\Models\Keranjang;
@@ -48,7 +49,7 @@ class CheckOutController extends Controller
 
             $totalItems = $cartItems->sum('jumlah');
         } else {
-            $builds = $user->builds()
+            $builds = Build::find(request('build_id'))
                 ->with('components.produk')
                 ->find(request('build_id'));
 

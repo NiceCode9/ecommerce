@@ -35,6 +35,9 @@ Route::middleware(['auth', 'checkrole:admin'])->prefix('admin')->name('admin.')-
     Route::get('/rakitan', [SimulasiController::class, 'adminIndex'])->name('rakit.index');
     Route::get('/rakitan/create', [SimulasiController::class, 'adminCreate'])->name('rakit.create');
     Route::post('/rakitan', [SimulasiController::class, 'saveBuildAdmin'])->name('rakit.store');
+    Route::get('/rakitan/{build}/edit', [SimulasiController::class, 'editRakitanAdmin'])->name('rakit.edit');
+    Route::put('/rakitan/{build}', [SimulasiController::class, 'updateRakitanAdmin'])->name('rakit.update');
+    Route::delete('/rakitan/{build}', [SimulasiController::class, 'destroy'])->name('rakit.destroy');
 });
 
 

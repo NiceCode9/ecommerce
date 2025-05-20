@@ -40,32 +40,6 @@ class SimulasiController extends Controller
         return view('front.simulasi.index', compact('brands', 'kategori', 'sockets', 'processors', 'motherboards', 'rams', 'initialData'));
     }
 
-    public function adminIndex()
-    {
-        $data = Build::whereNotNull('kategori_id')->get();
-        return view('admin.rakitan.index', compact('data'));
-    }
-
-    public function adminCreate()
-    {
-        $brands = Brand::where('is_processor', true)->get();
-        $kategori = Kategori::whereHas('children')->where('tipe', 'general')->orderBy('nama', 'ASC')->get();
-        $sockets = Socket::with('brand')->get();
-        $processors = Produk::with(['kategori' => fn($q) => $q->where('tipe', 'processor')])
-            ->get();
-        $motherboards = Produk::with(['kategori' => fn($q) => $q->where('tipe', 'motherboard')])
-            ->get();
-        // $rams = Produk::with(['kategori' => fn($q) => $q->where('tipe', 'memory')])
-        //     ->get();
-        $rams = Produk::whereHas('kategori', function ($query) {
-            $query->where('tipe', 'memory');
-        })->get();
-        $kategoriBuilds = KategoriBuild::orderBy('nama', 'asc')->get();
-
-
-        return view('admin.rakitan.create', compact('brands', 'kategori', 'kategoriBuilds', 'sockets', 'processors', 'motherboards', 'rams'));
-    }
-
     public function getSockets(Request $request)
     {
         $sockets = Socket::where('brand_id', $request->brand_id)->get();
@@ -96,71 +70,6 @@ class SimulasiController extends Controller
         $query->whereHas('kategori', fn($q) => $q->where('tipe', $type));
 
         return response()->json($query->get());
-    }
-
-    public function saveBuildAdmin(Request $request)
-    {
-        // $request->validate([
-        //     'description' => 'required',
-        //     'brand_id' => 'required',
-        //     'socket_id' => 'required',
-        //     'kategoriBuild_id' => 'required',
-        // ]);
-
-        DB::beginTransaction();
-        try {
-            $kategoriBuild = KategoriBuild::find($request->kategoriBuild_id);
-            $words = explode(' ', $kategoriBuild->nama);
-            $initial = '';
-            foreach ($words as $word) {
-                if (!empty($word)) {
-                    $initial .= strtoupper($word[0]);
-                }
-            }
-            $kode = 'SML-' . $initial . '-' . strtoupper(uniqid());
-            $name = $kode;
-            $slug = Str::slug($name);
-            $componentsData = [];
-
-            foreach ($request->components as $componentType => $component) {
-                $componentsData[] = [
-                    'produk_id' => $component['id'],
-                    'component_type' => $componentType,
-                    'quantity' => $component['quantity'],
-                    'subtotal' => $component['subtotal'],
-                ];
-            }
-
-            $build = Build::create([
-                'kode' => $kode,
-                'user_id' => auth()->user()->id,
-                'kategori_id' => $request->kategoriBuild_id,
-                'name' => $kode,
-                'slug' => $slug,
-                'description' => $request->description,
-                'total_price' => $request->total_price,
-                'mode' => $request->mode,
-                'status' => 'published',
-                'brand_id' => $request->brand_id,
-                'socket_id' => $request->socket_id,
-            ]);
-
-            foreach ($componentsData as $component) {
-                $build->components()->create($component);
-            }
-            DB::commit();
-
-            return response()->json([
-                'success' => true,
-            ]);
-        } catch (\Throwable $th) {
-            //throw $th;
-            DB::rollBack();
-            return response()->json([
-                'success' => false,
-                'message' => 'Gagal menyimpan rakitan: ' . $th->getMessage()
-            ], 500);
-        }
     }
 
     public function saveBuild(Request $request)
@@ -249,9 +158,9 @@ class SimulasiController extends Controller
     public function show(Build $build)
     {
         // Authorization - hanya pemilik yang bisa melihat
-        if ($build->user_id !== auth()->id()) {
-            abort(403);
-        }
+        // if ($build->user_id !== auth()->id()) {
+        //     abort(403);
+        // }
 
         $build->load('components.produk.kategori');
 
@@ -271,12 +180,180 @@ class SimulasiController extends Controller
             $build->delete();
             DB::commit();
 
-            return redirect()->route('simulasi.list')
+            if (auth()->user()->role == 'admin') {
+                $route = 'admin.rakit.index';
+            } else {
+                $route = 'pelanggan.simulasi.list';
+            }
+
+            return redirect()->route($route)
                 ->with('success', 'Rakitan berhasil dihapus');
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->back()
                 ->with('error', 'Gagal menghapus rakitan: ' . $e->getMessage());
+        }
+    }
+
+    public function adminIndex()
+    {
+        $data = Build::whereNotNull('kategori_id')->get();
+        return view('admin.rakitan.index', compact('data'));
+    }
+
+    public function adminCreate()
+    {
+        $brands = Brand::where('is_processor', true)->get();
+        $kategori = Kategori::whereHas('children')->where('tipe', 'general')->orderBy('nama', 'ASC')->get();
+        $sockets = Socket::with('brand')->get();
+        $processors = Produk::whereHas('kategori', fn($q) => $q->where('tipe', 'processor'))
+            ->get();
+        $motherboards = Produk::whereHas('kategori', fn($q) => $q->where('tipe', 'motherboard'))
+            ->get();
+        // $rams = Produk::with(['kategori' => fn($q) => $q->where('tipe', 'memory')])
+        //     ->get();
+        $rams = Produk::whereHas('kategori', function ($query) {
+            $query->where('tipe', 'memory');
+        })->get();
+        $kategoriBuilds = KategoriBuild::orderBy('nama', 'asc')->get();
+
+
+        return view('admin.rakitan.create', compact('brands', 'kategori', 'kategoriBuilds', 'sockets', 'processors', 'motherboards', 'rams'));
+    }
+
+    public function saveBuildAdmin(Request $request)
+    {
+        // $request->validate([
+        //     'description' => 'required',
+        //     'brand_id' => 'required',
+        //     'socket_id' => 'required',
+        //     'kategoriBuild_id' => 'required',
+        // ]);
+
+        DB::beginTransaction();
+        try {
+            $kategoriBuild = KategoriBuild::find($request->kategoriBuild_id);
+            $words = explode(' ', $kategoriBuild->nama);
+            $initial = '';
+            foreach ($words as $word) {
+                if (!empty($word)) {
+                    $initial .= strtoupper($word[0]);
+                }
+            }
+            $kode = 'SML-' . $initial . '-' . strtoupper(uniqid());
+            $name = $kode;
+            $slug = Str::slug($name);
+            $componentsData = [];
+
+            foreach ($request->components as $componentType => $component) {
+                $componentsData[] = [
+                    'produk_id' => $component['id'],
+                    'component_type' => $componentType,
+                    'quantity' => $component['quantity'],
+                    'subtotal' => $component['subtotal'],
+                ];
+            }
+
+            $build = Build::create([
+                'kode' => $kode,
+                'user_id' => auth()->user()->id,
+                'kategori_id' => $request->kategoriBuild_id,
+                'name' => $kode,
+                'slug' => $slug,
+                'description' => $request->description,
+                'total_price' => $request->total_price,
+                'mode' => $request->mode,
+                'status' => 'published',
+                'brand_id' => $request->brand_id,
+                'socket_id' => $request->socket_id,
+            ]);
+
+            foreach ($componentsData as $component) {
+                $build->components()->create($component);
+            }
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+            ]);
+        } catch (\Throwable $th) {
+            //throw $th;
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal menyimpan rakitan: ' . $th->getMessage()
+            ], 500);
+        }
+    }
+
+    public function rekomendasi()
+    {
+        $builds = Build::with('components.produk')
+            ->whereHas('user', function ($query) {
+                $query->where('role', 'admin');
+            })
+            ->orderBy('created_at', 'DESC')
+            ->paginate(10);
+
+        return view('front.simulasi.rekomendasi', compact('builds'));
+    }
+
+    public function editRakitanAdmin(Build $build)
+    {
+        $brands = Brand::where('is_processor', true)->get();
+        $kategori = Kategori::whereHas('children')->where('tipe', 'general')->orderBy('nama', 'ASC')->get();
+        $sockets = Socket::with('brand')->get();
+        $processors = Produk::whereHas('kategori', fn($q) => $q->where('tipe', 'processor'))
+            ->get();
+        $motherboards = Produk::whereHas('kategori', fn($q) => $q->where('tipe', 'motherboard'))
+            ->get();
+        $rams = Produk::whereHas('kategori', function ($query) {
+            $query->where('tipe', 'memory');
+        })->get();
+        $kategoriBuilds = KategoriBuild::orderBy('nama', 'asc')->get();
+
+        $build->load('components.produk');
+
+        return view('admin.rakitan.edit', compact('build', 'brands', 'kategori', 'kategoriBuilds', 'sockets', 'processors', 'motherboards', 'rams'));
+    }
+
+    public function updateRakitanAdmin(Request $request, Build $build)
+    {
+        DB::beginTransaction();
+        try {
+            $build->description = $request->description;
+            $build->kategori_id = $request->kategoriBuild_id;
+            $build->brand_id = $request->brand_id;
+            $build->socket_id = $request->socket_id;
+            $build->total_price = $request->total_price;
+            $build->save();
+
+            // Delete existing components
+            $build->components()->delete();
+
+            // Add new components
+            $componentsData = [];
+            foreach ($request->components as $componentType => $component) {
+                $componentsData[] = [
+                    'produk_id' => $component['id'],
+                    'component_type' => $componentType,
+                    'quantity' => $component['quantity'],
+                    'subtotal' => $component['subtotal'],
+                ];
+            }
+
+            foreach ($componentsData as $component) {
+                $build->components()->create($component);
+            }
+
+            DB::commit();
+            return response()->json(['success' => true]);
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal mengupdate rakitan: ' . $th->getMessage()
+            ], 500);
         }
     }
 }

@@ -162,6 +162,13 @@ scratch. This page gets rid of all links and provides the needed markup only.
                                         <p>Produk</p>
                                     </a>
                                 </li>
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.rakit.index') }}"
+                                        class="nav-link {{ request()->routeIs('admin.rakit*') ? 'active' : '' }}">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Rekomendasi Rakitan</p>
+                                    </a>
+                                </li>
                             </ul>
                         </li>
                         <li class="nav-item">
