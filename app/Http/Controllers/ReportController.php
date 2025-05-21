@@ -178,21 +178,39 @@ class ReportController extends Controller
     {
         $salesData = [];
         $dateRange = [];
+        $diffInDays = $startDate->diffInDays($endDate);
 
-        for ($date = $startDate->copy(); $date->lte($endDate); $date->addDay()) {
-            $formattedDate = $date->format('Y-m-d');
-            $dateRange[] = $date->format('d M');
+        // Jika rentang lebih dari 60 hari (2 bulan), tampilkan per bulan
+        if ($diffInDays > 60) {
+            for ($date = $startDate->copy(); $date->lte($endDate); $date->addMonth()) {
+                $yearMonth = $date->format('Y-m');
+                $dateRange[] = $date->format('M Y'); // Format: Jan 2023
 
-            $total = Pesanan::whereDate('created_at', $formattedDate)
-                ->where('status', 'selesai')
-                ->sum('total_bayar');
+                $total = Pesanan::whereYear('created_at', $date->year)
+                    ->whereMonth('created_at', $date->month)
+                    ->where('status', 'selesai')
+                    ->sum('total_bayar');
 
-            $salesData[] = $total ?? 0;
+                $salesData[] = $total ?? 0;
+            }
+        } else {
+            // Tampilkan per hari
+            for ($date = $startDate->copy(); $date->lte($endDate); $date->addDay()) {
+                $formattedDate = $date->format('Y-m-d');
+                $dateRange[] = $date->format('d M'); // Format: 15 Jan
+
+                $total = Pesanan::whereDate('created_at', $formattedDate)
+                    ->where('status', 'selesai')
+                    ->sum('total_bayar');
+
+                $salesData[] = $total ?? 0;
+            }
         }
 
         return [
             'dates' => $dateRange,
-            'sales' => $salesData
+            'sales' => $salesData,
+            'group_by' => $diffInDays > 60 ? 'month' : 'day' // Tambahkan info grouping
         ];
     }
 }

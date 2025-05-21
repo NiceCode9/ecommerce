@@ -3,10 +3,10 @@
 @section('content')
     <div class="card">
         <div class="card-header">
-            <h3 class="card-title">Laporan Ringkasan Penjualan</h3>
-            <div class="card-tools">
-                <span class="badge badge-primary">{{ $start_date }} - {{ $end_date }}</span>
-            </div>
+            <h3 class="card-title">
+                {{ $daily_sales['group_by'] == 'month' ? 'Penjualan Bulanan' : 'Penjualan Harian' }}
+                <small class="text-muted">({{ $start_date }} - {{ $end_date }})</small>
+            </h3>
         </div>
         <div class="card-body">
             <div class="row mb-4">
@@ -89,15 +89,50 @@
                 data: {
                     labels: @json($daily_sales['dates']),
                     datasets: [{
-                        label: 'Penjualan',
+                        label: '{{ $daily_sales['group_by'] == 'month' ? 'Penjualan Bulanan' : 'Penjualan Harian' }}',
                         backgroundColor: 'rgba(60,141,188,0.9)',
                         borderColor: 'rgba(60,141,188,0.8)',
-                        data: @json($daily_sales['sales'])
+                        data: @json($daily_sales['sales']),
+                        barThickness: 'flex',
                     }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return 'Rp ' + value.toString().replace(/\B(?=(\d{3})+(?!\d))/g,
+                                        ".");
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    label += 'Rp ' + context.raw.toString().replace(
+                                        /\B(?=(\d{3})+(?!\d))/g, ".");
+                                    return label;
+                                }
+                            }
+                        }
+                    }
                 }
             });
 
-            // Order Status Chart
+            // Order Status Chart (tetap sama)
             var orderStatusCtx = document.getElementById('orderStatusChart').getContext('2d');
             var orderStatusChart = new Chart(orderStatusCtx, {
                 type: 'pie',
