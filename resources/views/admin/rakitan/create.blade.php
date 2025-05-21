@@ -107,7 +107,7 @@
                             <div class="mb-3">
                                 <h5 class="font-weight-bold">{{ Str::upper($k->nama) }}</h3>
                                     @foreach ($k->children()->where('tipe', 'general')->get() as $item)
-                                        <div class="row section-form align-items-center">
+                                        <div class="row form-section align-items-center">
                                             <div class="col-md-3">
                                                 <label>Pilih {{ Str::upper($item->nama) }}</label>
                                             </div>
@@ -116,10 +116,10 @@
                                                     <select class="form-control component-select"
                                                         data-component="{{ Str::slug($item->nama) }}">
                                                         <option value="">Pilih {{ $item->nama }}</option>
-                                                        @foreach ($item->produk as $produk)
-                                                            <option value="{{ $produk->id }}"
-                                                                data-harga="{{ $produk->harga_setelah_diskon }}">
-                                                                {{ $produk->nama }}
+                                                        @foreach ($item->produk as $p)
+                                                            <option value="{{ $p->id }}"
+                                                                data-harga="{{ $p->harga }}">
+                                                                {{ $p->nama }}
                                                             </option>
                                                         @endforeach
                                                     </select>
@@ -127,7 +127,8 @@
                                             </div>
                                             <div class="col-md-1 form-group">
                                                 <input type="number" class="form-control quantity"
-                                                    data-component="{{ Str::slug($item->nama) }}" min="1">
+                                                    data-component="{{ Str::slug($item->nama) }}" min="1"
+                                                    value="1">
                                             </div>
                                             <div class="col-md-2 form-group">
                                                 <input type="text" class="form-control subtotal"
@@ -164,7 +165,6 @@
     <script>
         $(document).ready(function() {
             async function changePrice(componentType) {
-                console.log(componentType);
                 const section = $(`.form-section:has([data-component="${componentType}"])`);
                 const select = section.find('.component-select');
                 const quantity = section.find('.quantity').val();
@@ -230,6 +230,7 @@
                     $('.component-select').each(function() {
                         const componentType = $(this).data('component');
                         if (!['processor', 'motherboard', 'ram'].includes(componentType)) {
+                            console.log(componentType);
                             const quantity = $(`input[data-component="${componentType}"].quantity`)
                                 .val();
                             const subtotal = $(`input[data-component="${componentType}"].subtotal`)
