@@ -17,6 +17,7 @@ Route::get('/simulasi', [SimulasiController::class, 'index'])->name('simulasi.in
 Route::get('/simulasi/rekomendasi', [SimulasiController::class, 'rekomendasi'])->name('simulasi.rekomendasi');
 Route::get('/simulasi/api/components/{type}', [SimulasiController::class, 'getComponents'])->name('simulasi.getComponents');
 Route::get('/simulasi/api/sockets', [SimulasiController::class, 'getSockets'])->name('simulasi.getSockets');
+Route::get('/simulasi/{build}', [SimulasiController::class, 'show'])->name('pelanggan.simulasi.show');
 
 Route::middleware(['auth', 'checkrole:pelanggan'])
     ->name('pelanggan.')
@@ -63,7 +64,7 @@ Route::middleware(['auth', 'checkrole:pelanggan'])
         // Route::prefix('simulasi')->group(function () {
         Route::post('/simulasi/save', [SimulasiController::class, 'saveBuild'])->name('simulasi.save');
         Route::get('/simulasi/list', [SimulasiController::class, 'list'])->name('simulasi.list');
-        Route::get('/simulasi/{build}', [SimulasiController::class, 'show'])->name('simulasi.show');
+        // Route::get('/simulasi/{build}', [SimulasiController::class, 'show'])->name('simulasi.show');
         Route::delete('/simulasi/{build}', [SimulasiController::class, 'destroy'])->name('simulasi.destroy');
         // });
     });
