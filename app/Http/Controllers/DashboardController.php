@@ -139,16 +139,61 @@ class DashboardController extends Controller
     {
         $dates = [];
         $salesData = [];
+        $diffInDays = $startDate->diffInDays($endDate);
 
-        for ($date = $startDate->copy(); $date->lte($endDate); $date->addDay()) {
-            $formattedDate = $date->format('Y-m-d');
-            $dates[] = $date->format('d M');
+        // Format label berdasarkan rentang waktu
+        if ($diffInDays <= 1) {
+            // Harian (per jam)
+            for ($date = $startDate->copy(); $date->lte($endDate); $date->addHour()) {
+                $formattedDate = $date->format('Y-m-d H:00:00');
+                $dates[] = $date->format('H:i');
 
-            $total = Pembayaran::whereDate('created_at', $formattedDate)
-                ->where('status', 'sukses')
-                ->sum('jumlah');
+                $total = Pembayaran::whereBetween('created_at', [
+                    $formattedDate,
+                    $date->copy()->addHour()->format('Y-m-d H:00:00')
+                ])
+                    ->where('status', 'sukses')
+                    ->sum('jumlah');
 
-            $salesData[] = $total ?? 0;
+                $salesData[] = $total ?? 0;
+            }
+        } elseif ($diffInDays <= 31) {
+            // Mingguan/Bulanan (per hari)
+            for ($date = $startDate->copy(); $date->lte($endDate); $date->addDay()) {
+                $formattedDate = $date->format('Y-m-d');
+                $dates[] = $date->format('d M');
+
+                $total = Pembayaran::whereDate('created_at', $formattedDate)
+                    ->where('status', 'sukses')
+                    ->sum('jumlah');
+
+                $salesData[] = $total ?? 0;
+            }
+        } elseif ($diffInDays <= 365) {
+            // Tahunan (per bulan)
+            for ($date = $startDate->copy(); $date->lte($endDate); $date->addMonth()) {
+                $formattedDate = $date->format('Y-m');
+                $dates[] = $date->format('M Y');
+
+                $total = Pembayaran::whereYear('created_at', $date->year)
+                    ->whereMonth('created_at', $date->month)
+                    ->where('status', 'sukses')
+                    ->sum('jumlah');
+
+                $salesData[] = $total ?? 0;
+            }
+        } else {
+            // Lebih dari 1 tahun (per tahun)
+            for ($date = $startDate->copy(); $date->lte($endDate); $date->addYear()) {
+                $formattedDate = $date->format('Y');
+                $dates[] = $date->format('Y');
+
+                $total = Pembayaran::whereYear('created_at', $date->year)
+                    ->where('status', 'sukses')
+                    ->sum('jumlah');
+
+                $salesData[] = $total ?? 0;
+            }
         }
 
         return [
