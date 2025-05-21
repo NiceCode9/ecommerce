@@ -35,7 +35,7 @@
                 data: {
                     labels: {!! json_encode($salesChart['labels']) !!},
                     datasets: [{
-                        label: 'Penjualan',
+                        label: 'Penjualan ({{ $startDate->format('d M Y') }} - {{ $endDate->format('d M Y') }})',
                         backgroundColor: 'rgba(60,141,188,0.9)',
                         borderColor: 'rgba(60,141,188,0.8)',
                         data: {!! json_encode($salesChart['data']) !!}

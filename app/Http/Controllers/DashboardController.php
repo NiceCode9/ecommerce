@@ -11,63 +11,106 @@ use App\Models\Pembayaran;
 use App\Models\Pesanan;
 use App\Models\Produk;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        // Statistik utama
-        $totalOrders = Pesanan::count();
-        $totalRevenue = Pesanan::where('status', 'selesai')->sum('total_bayar');
-        $totalProducts = Produk::count();
-        $pendingPayments = Pembayaran::where('status', 'pending')->count();
+        $filter = $request->input('filter', '30days'); // default 30 hari terakhir
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
 
-        // Pesanan terbaru
+        switch ($filter) {
+            case 'today':
+                $startDate = Carbon::today();
+                $endDate = Carbon::today();
+                break;
+            case 'yesterday':
+                $startDate = Carbon::yesterday();
+                $endDate = Carbon::yesterday();
+                break;
+            case 'week':
+                $startDate = Carbon::now()->startOfWeek();
+                $endDate = Carbon::now()->endOfWeek();
+                break;
+            case 'month':
+                $startDate = Carbon::now()->startOfMonth();
+                $endDate = Carbon::now()->endOfMonth();
+                break;
+            case 'year':
+                $startDate = Carbon::now()->startOfYear();
+                $endDate = Carbon::now()->endOfYear();
+                break;
+            case 'custom':
+                $startDate = $startDate ? Carbon::parse($startDate) : Carbon::now()->subDays(30);
+                $endDate = $endDate ? Carbon::parse($endDate) : Carbon::now();
+                break;
+            default: // 30days
+                $startDate = Carbon::now()->subDays(30);
+                $endDate = Carbon::now();
+                break;
+        }
+
+        // Statistik utama dengan filter tanggal
+        $totalOrders = Pesanan::whereBetween('created_at', [$startDate, $endDate])->count();
+        $totalRevenue = Pesanan::where('status', 'selesai')
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->sum('total_bayar');
+        $totalProducts = Produk::count(); // Ini tidak perlu filter tanggal
+        $pendingPayments = Pembayaran::where('status', 'pending')
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->count();
+
+        // Pesanan terbaru dengan filter tanggal
         $recentOrders = Pesanan::with('pengguna')
+            ->whereBetween('created_at', [$startDate, $endDate])
             ->latest()
             ->take(10)
             ->get();
 
-        // Data untuk grafik penjualan 30 hari terakhir
-        $salesChart = $this->getSalesChartData();
+        // Data untuk grafik penjualan dengan filter
+        $salesChart = $this->getSalesChartData($startDate, $endDate);
 
-        // Data untuk grafik kategori produk
+        // Data untuk grafik kategori produk (tidak perlu filter tanggal)
         $categoryChart = $this->getCategoryChartData();
 
-        // Produk terlaris (berdasarkan jumlah penjualan)
-        $bestSellingProducts = Produk::withCount(['detailPesanan as total_terjual' => function ($query) {
-            $query->select(DB::raw('COALESCE(SUM(jumlah), 0)'));
+        // Produk terlaris dengan filter tanggal
+        $bestSellingProducts = Produk::withCount(['detailPesanan as total_terjual' => function ($query) use ($startDate, $endDate) {
+            $query->select(DB::raw('COALESCE(SUM(jumlah), 0)'))
+                ->join('pesanan', 'detail_pesanan.pesanan_id', '=', 'pesanan.id')
+                ->whereBetween('pesanan.created_at', [$startDate, $endDate]);
         }])
             ->orderByDesc('total_terjual')
             ->take(10)
             ->get();
 
-        // Produk paling sering dilihat
+        // Produk paling sering dilihat (tidak perlu filter tanggal)
         $mostViewedProducts = Produk::orderByDesc('dilihat')
             ->take(10)
             ->get();
 
-        // Produk dengan rating tertinggi
+        // Produk dengan rating tertinggi (tidak perlu filter tanggal)
         $topRatedProducts = Produk::where('rating', '>', 0)
             ->orderByDesc('rating')
             ->take(10)
             ->get();
 
-        // Produk dengan rating terendah (hanya yang memiliki rating)
+        // Produk dengan rating terendah (tidak perlu filter tanggal)
         $lowRatedProducts = Produk::where('rating', '>', 0)
             ->orderBy('rating')
             ->take(10)
             ->get();
 
-        // Produk yang hampir habis stoknya (stok < 10)
+        // Produk yang hampir habis stok (tidak perlu filter tanggal)
         $lowStockProducts = Produk::where('stok', '<', 10)
             ->where('stok', '>', 0)
             ->orderBy('stok')
             ->take(10)
             ->get();
 
-        // Produk yang habis stok
+        // Produk yang habis stok (tidak perlu filter tanggal)
         $outOfStockProducts = Produk::where('stok', '<=', 0)
             ->take(10)
             ->get();
@@ -85,19 +128,19 @@ class DashboardController extends Controller
             'topRatedProducts',
             'lowRatedProducts',
             'lowStockProducts',
-            'outOfStockProducts'
+            'outOfStockProducts',
+            'filter',
+            'startDate',
+            'endDate'
         ));
     }
 
-    protected function getSalesChartData()
+    protected function getSalesChartData($startDate, $endDate)
     {
-        $endDate = Carbon::now();
-        $startDate = Carbon::now()->subDays(30);
-
         $dates = [];
         $salesData = [];
 
-        for ($date = $startDate; $date->lte($endDate); $date->addDay()) {
+        for ($date = $startDate->copy(); $date->lte($endDate); $date->addDay()) {
             $formattedDate = $date->format('Y-m-d');
             $dates[] = $date->format('d M');
 
